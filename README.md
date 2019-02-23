@@ -10,7 +10,7 @@
 
 4. npm start
 
-5. open chrome to localhost:8080
+5. open chrome to localhost:8964
 
 
 ## Tools:
