@@ -1,6 +1,6 @@
 # Sample Web App : Fabulous Faucet
 
-Steps:
+## Steps:
 
 1. modify the codes in /src
 
@@ -13,7 +13,7 @@ Steps:
 5. open chrome to localhost:8080
 
 
-Tools:
+## Tools:
 
 1. [ESlint](https://eslint.org/) : A javascript linter
    
@@ -36,7 +36,7 @@ Tools:
 
 9. [react native]
 
-## Steps
+## Contribution
 
 npm install --save-dev @babel/core@^7.0.0-0
 
