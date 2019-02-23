@@ -38,16 +38,16 @@
 
 ## Contribution
 
-npm install --save-dev @babel/core@^7.0.0-0
 
 ### Design the logic
 
-
+WIP
 
 ### Write the codes
 
+1. Choose VS Code and some extension for nodejs, reactjs.
 
-1. Use express / react to create a simple web App. Create a server.js in the root folder. Add run script to package.json. Use **npm start** as the main start script.
+2. Use express / react / react boostrap to create a simple web App. Create a server.js in the root folder. Add run script to package.json. Use **npm start** as the main start script.
 
 ```js
 
@@ -66,9 +66,6 @@ console.log(`Listening on port ${port}`);
 app.listen(port);
 
 ```
-
-
-2. 
 
 
 
