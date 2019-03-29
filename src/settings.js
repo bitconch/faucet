@@ -89,7 +89,7 @@ export class Settings extends React.Component {
                   onSelect={::this.setNetworkEntryPoint}
                 >
                   {[
-                    web3.testnetChannelEndpoint(),
+                    'https://api.bitconch.io',
                     'http://localhost:8899',
                   ].map((url, index) => (
                     <MenuItem key={index} eventKey={url}>
