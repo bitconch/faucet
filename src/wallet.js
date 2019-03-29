@@ -401,6 +401,11 @@ export class Wallet extends React.Component {
         Request an airdrop
       </Tooltip>
     );
+    const resetTooltip = (
+      <Tooltip id="resetaccount">
+        Request New Account
+      </Tooltip>
+    );
 
     const busyModal = this.state.busyModal ?
       <BusyModal show title={this.state.busyModal.title} text={this.state.busyModal.text} /> : null;
@@ -454,6 +459,9 @@ export class Wallet extends React.Component {
             <Button disabled={airdropDisabled} onClick={() => this.requestAirdrop()}>
               <Glyphicon glyph="send" />
             </Button>
+          </OverlayTrigger>
+          <OverlayTrigger placement="bottom" overlay={resetTooltip}>
+          <Button bsStyle="danger" onClick={() => this.resetAccount()}><Glyphicon glyph="info-sign" /></Button>
           </OverlayTrigger>
         </Well>
         <p/>
