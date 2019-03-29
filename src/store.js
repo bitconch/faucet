@@ -6,7 +6,7 @@ export class Store {
   constructor() {
     this._ee = new EventEmitter();
     this._lf = localforage.createInstance({
-      name: 'configuration',
+      name: 'configuration'
     });
   }
 
@@ -19,7 +19,7 @@ export class Store {
     }
 
     if (typeof this.networkEntryPoint !== 'string') {
-      this.networkEntryPoint = 'https://api.bitconch.io';
+      this.networkEntryPoint = 'https://api.testnet.solana.com';
     }
 
     if (!this.accountSecretKey) {
@@ -49,4 +49,6 @@ export class Store {
   removeChangeListener(fn) {
     this._ee.off('change', fn);
   }
+
 }
+

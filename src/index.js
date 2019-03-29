@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {Wallet} from './faucet';
+import {Wallet} from './wallet';
 import {Store} from './store';
 
 class App extends React.Component {
   state = {
     store: new Store(),
     initialized: false,
-  };
+  }
 
   async componentDidMount() {
     await this.state.store.init();
