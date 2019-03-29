@@ -1,6 +1,6 @@
 import localforage from 'localforage';
 import EventEmitter from 'event-emitter';
-import * as web3 from '@solana/web3.js';
+import * as web3 from '@bitconch/bitconch-web3j';
 
 export class Store {
   constructor() {

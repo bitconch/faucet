@@ -4,7 +4,7 @@
 [include]
 
 [libs]
-node_modules/@solana/web3.js/module.flow.js
+node_modules/@bitconch/bitconch-web3j/module.flow.js
 
 emoji=true
 esproposal.class_instance_fields=enable
