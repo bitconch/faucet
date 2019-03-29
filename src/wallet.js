@@ -20,7 +20,7 @@ import * as web3 from '@solana/web3.js';
 
 import {Settings} from './settings';
 
-const AIRDORP_QUOTA = 1000000000000000000;
+const AIRDORP_QUOTA = 3000;
 
 class PublicKeyInput extends React.Component {
   state = {
