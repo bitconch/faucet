@@ -20,6 +20,8 @@ import * as web3 from '@solana/web3.js';
 
 import {Settings} from './settings';
 
+const AIRDORP_QUOTA = 1000000000000000000;
+
 class PublicKeyInput extends React.Component {
   state = {
     value: '',
@@ -341,7 +343,7 @@ export class Wallet extends React.Component {
       'Requesting Airdrop',
       'Please wait...',
       async () => {
-        await this.web3sol.requestAirdrop(this.web3solAccount.publicKey, 1000);
+        await this.web3sol.requestAirdrop(this.web3solAccount.publicKey, AIRDORP_QUOTA);
         this.setState({
           balance: await this.web3sol.getBalance(this.web3solAccount.publicKey),
         });
