@@ -409,7 +409,9 @@ export class Wallet extends React.Component {
         this.state.recipientAmount,
       );
       const signature = await this.web3sol.sendTransaction(
+
         this.web3solAccount, transaction,
+      
       );
 
       await this.web3sol.confirmTransaction(signature);
