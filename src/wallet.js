@@ -16,7 +16,7 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
-import * as web3 from '@solana/web3.js';
+import * as web3 from '@bitconch/bitconch-web3j';
 
 import {Settings} from './settings';
 

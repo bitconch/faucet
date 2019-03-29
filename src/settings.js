@@ -10,7 +10,7 @@ import {
   Panel,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import * as web3 from '@solana/web3.js';
+import * as web3 from '@bitconch/bitconch-web3j';
 
 export class Settings extends React.Component {
   forceUpdate = () => {
