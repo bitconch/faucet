@@ -40,7 +40,7 @@ export class Settings extends React.Component {
 
   async checkNetwork() {
     console.log(
-      'Checking network:',
+      '检查网络:',
       this.props.store.networkEntryPoint
     );
 
@@ -49,7 +49,7 @@ export class Settings extends React.Component {
     const checkNetworkCount = this.state.checkNetworkCount + 1;
     this.setState({
       validationState: 'warning',
-      validationHelpBlock: 'Connecting to network...',
+      validationHelpBlock: '连接到网络...',
       checkNetworkCount,
     });
 
@@ -59,7 +59,7 @@ export class Settings extends React.Component {
       if (this.state.checkNetworkCount <= checkNetworkCount) {
         this.setState({
           validationState: 'success',
-          validationHelpBlock: 'Connected',
+          validationHelpBlock: '连接成功',
         });
       }
     } catch (err) {
@@ -67,7 +67,7 @@ export class Settings extends React.Component {
       if (this.state.checkNetworkCount <= checkNetworkCount) {
         this.setState({
           validationState: 'error',
-          validationHelpBlock: 'Connection failed',
+          validationHelpBlock: '连接失败',
         });
       }
     }
@@ -82,7 +82,7 @@ export class Settings extends React.Component {
       <div>
         <p/>
         <Panel>
-          <Panel.Heading>Network Settings</Panel.Heading>
+          <Panel.Heading>网络设置</Panel.Heading>
           <Panel.Body>
             <FormGroup
               validationState={this.state.validationState}
@@ -90,20 +90,20 @@ export class Settings extends React.Component {
               <InputGroup>
                 <DropdownButton
                   componentClass={InputGroup.Button}
-                  title="Network"
+                  title="网络"
                   onSelect={::this.setNetworkEntryPoint}
                 >
                   {
                     [
                       'https://api.bitconch.io',
-                      'http://localhost:8899'
+                      'http://47.91.255.38:8899'
                     ].map((url, index) => <MenuItem key={index} eventKey={url}>{url}</MenuItem>)
                   }
                 </DropdownButton>
                 <FormControl
                   type="text"
                   value={this.props.store.networkEntryPoint}
-                  placeholder="Enter the URI of the network"
+                  placeholder="输入网络URI"
                   onChange={(e) => this.setNetworkEntryPoint(e.target.value)}
                 />
                 <FormControl.Feedback />
@@ -114,12 +114,12 @@ export class Settings extends React.Component {
         </Panel>
         <p/>
         <Panel>
-          <Panel.Heading>Account Settings</Panel.Heading>
+          <Panel.Heading>账户设置</Panel.Heading>
           <Panel.Body>
-            <Button bsStyle="danger" onClick={() => this.resetAccount()}>Reset Account</Button>
+            <Button bsStyle="danger" onClick={() => this.resetAccount()}>重置账户</Button>
             <p />
             <HelpBlock>
-              Any tokens associated with the current account will be lost
+              重置后，当前账户相关的信息将会丢失
             </HelpBlock>
           </Panel.Body>
         </Panel>

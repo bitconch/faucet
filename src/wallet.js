@@ -56,11 +56,11 @@ class PublicKeyInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Recipient&apos;s Public Key</ControlLabel>
+          <ControlLabel>收款人地址</ControlLabel>
           <FormControl
             type="text"
             value={this.state.value}
-            placeholder="Enter the public key of the recipient"
+            placeholder="请输入收款人的地址"
             onChange={(e) => this.handleChange(e)}
           />
           <FormControl.Feedback />
@@ -103,11 +103,11 @@ class TokenInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Amount</ControlLabel>
+          <ControlLabel>数量</ControlLabel>
           <FormControl
             type="text"
             value={this.state.value}
-            placeholder="Enter amount to transfer"
+            placeholder="请输入交易数量"
             onChange={(e) => this.handleChange(e)}
           />
           <FormControl.Feedback />
@@ -155,11 +155,11 @@ class SignatureInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Signature</ControlLabel>
+          <ControlLabel>签名</ControlLabel>
           <FormControl
             type="text"
             value={this.state.value}
-            placeholder="Enter a transaction signature"
+            placeholder="请输入签名"
             onChange={(e) => this.handleChange(e)}
           />
           <FormControl.Feedback />
@@ -230,7 +230,7 @@ class SettingsModal extends React.Component {
         aria-labelledby="contained-modal-title-lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-lg">Settings</Modal.Title>
+          <Modal.Title id="contained-modal-title-lg">设置</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Settings store={this.props.store} />
@@ -328,8 +328,8 @@ export class Wallet extends React.Component {
 
   refreshBalance() {
     this.runModal(
-      'Updating Account Balance',
-      'Please wait...',
+      '更新账户余额',
+      '请稍后...',
       async () => {
         this.setState({
           balance: await this.web3sol.getBalance(this.web3solAccount.publicKey),
@@ -340,8 +340,8 @@ export class Wallet extends React.Component {
 
   requestAirdrop() {
     this.runModal(
-      'Requesting Airdrop',
-      'Please wait...',
+      '申请空投',
+      '请稍后...',
       async () => {
         await this.web3sol.requestAirdrop(this.web3solAccount.publicKey, AIRDORP_QUOTA);
         this.setState({
@@ -353,8 +353,8 @@ export class Wallet extends React.Component {
 
   sendTransaction() {
     this.runModal(
-      'Sending Transaction',
-      'Please wait...',
+      '发送交易',
+      '请稍后...',
       async () => {
         const transaction = web3.SystemProgram.move(
           this.web3solAccount.publicKey,
@@ -374,8 +374,8 @@ export class Wallet extends React.Component {
 
   confirmTransaction() {
     this.runModal(
-      'Confirming Transaction',
-      'Please wait...',
+      '交易确认',
+      '请稍后...',
       async () => {
         const result = await this.web3sol.confirmTransaction(
           this.state.confirmationSignature,
@@ -390,22 +390,22 @@ export class Wallet extends React.Component {
   render() {
     const copyTooltip = (
       <Tooltip id="clipboard">
-        Copy public key to clipboard
+        复制到剪贴板
       </Tooltip>
     );
     const refreshBalanceTooltip = (
       <Tooltip id="refresh">
-        Refresh account balance
+        更新账户余额
       </Tooltip>
     );
     const airdropTooltip = (
       <Tooltip id="airdrop">
-        Request an airdrop
+        申请空投
       </Tooltip>
     );
     const resetTooltip = (
       <Tooltip id="resetaccount">
-        Request New Account
+        申请新账户
       </Tooltip>
     );
 
@@ -420,7 +420,6 @@ export class Wallet extends React.Component {
       /> : null;
 
     const sendDisabled = this.state.recipientPublicKey === null || this.state.recipientAmount === null;
-    const confirmDisabled = this.state.confirmationSignature === null;
     const airdropDisabled = this.state.balance !== 0;
 
     return (
@@ -437,7 +436,7 @@ export class Wallet extends React.Component {
         {settingsModal}
         <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
         <Well>
-          Account Public Key:
+          账户地址:
           <FormGroup>
             <InputGroup>
               <FormControl readOnly type="text" size="21" value={this.web3solAccount.publicKey}/>
@@ -451,7 +450,8 @@ export class Wallet extends React.Component {
             </InputGroup>
           </FormGroup>
           <p/>
-          Account Balance: {this.state.balance} &nbsp;
+          账户余额: {this.state.balance}&nbsp;BUS &nbsp;
+          <p/>
           <OverlayTrigger placement="top" overlay={refreshBalanceTooltip}>
             <Button onClick={() => this.refreshBalance()}>
               <Glyphicon glyph="refresh" />
@@ -468,33 +468,16 @@ export class Wallet extends React.Component {
         </Well>
         <p/>
         <Panel>
-          <Panel.Heading>Send Tokens</Panel.Heading>
+          <Panel.Heading>交易</Panel.Heading>
           <Panel.Body>
             <PublicKeyInput onPublicKey={(publicKey) => this.setRecipientPublicKey(publicKey)}/>
             <TokenInput onAmount={(amount) => this.setRecipientAmount(amount)}/>
             <div className="text-center">
-              <Button disabled={sendDisabled} onClick={() => this.sendTransaction()}>Send</Button>
+              <Button disabled={sendDisabled} onClick={() => this.sendTransaction()}>发送</Button>
             </div>
           </Panel.Body>
         </Panel>
         <p/>
-        <Panel>
-          <Panel.Heading>Confirm Transaction</Panel.Heading>
-          <Panel.Body>
-            <SignatureInput onSignature={(signature) => this.setConfirmationSignature(signature)}/>
-            <div className="text-center">
-              <Button disabled={confirmDisabled} onClick={() => this.confirmTransaction()}>Confirm</Button>
-            </div>
-            {
-              typeof this.state.transactionConfirmed === 'boolean'
-                ? (
-                  <b>
-                    {this.state.transactionConfirmed ? 'CONFIRMED' : 'NOT CONFIRMED'}
-                  </b>
-                ) : ''
-            }
-          </Panel.Body>
-        </Panel>
       </div>
     );
   }

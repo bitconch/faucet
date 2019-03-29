@@ -8,7 +8,7 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #303030;
+  background-color: #f4f5f9;
   font-family: "Rubik", sans-serif;
 }
 
@@ -24,8 +24,18 @@ body {
 
 .logo {
   display: block;
-  margin-left: auto;
+  /*margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
-  width: 50%;
+  margin-top: 20px;*/
+  margin: 0 auto;
+  width: auto;
+}
+
+.header_back {
+  background-image: url("img/guide.jpg");
+  padding: 10px 0 10px 0;
+}
+
+.balance_btn {
+  padding: 5px 9px;
 }
