@@ -95,7 +95,7 @@ export class Settings extends React.Component {
                 >
                   {
                     [
-                      'https://api.testnet.solana.com',
+                      'https://api.bitconch.io',
                       'http://localhost:8899'
                     ].map((url, index) => <MenuItem key={index} eventKey={url}>{url}</MenuItem>)
                   }
