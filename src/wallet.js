@@ -461,7 +461,7 @@ export class Wallet extends React.Component {
             </Button>
           </OverlayTrigger>
           <OverlayTrigger placement="bottom" overlay={resetTooltip}>
-          <Button bsStyle="danger" onClick={() => this.resetAccount()}><Glyphicon glyph="info-sign" /></Button>
+            <Button bsStyle="danger" onClick={() => this.resetAccount()}><Glyphicon glyph="info-sign" /></Button>
           </OverlayTrigger>
         </Well>
         <p/>
