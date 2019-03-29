@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {Wallet} from './wallet';
+import {Wallet} from './faucet';
 import {Store} from './store';
 
 class App extends React.Component {
