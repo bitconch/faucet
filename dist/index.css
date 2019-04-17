@@ -1,13 +1,11 @@
 html {
   height: 100%;
   width: 100%;
-  position: fixed;
 }
 
 body {
   height: 100%;
   width: 100%;
-  overflow: hidden;
   background-color: #f4f5f9;
   font-family: "Rubik", sans-serif;
 }
@@ -38,4 +36,8 @@ body {
 
 .balance_btn {
   padding: 5px 9px;
+}
+
+.input_width {
+  width: 500px;
 }

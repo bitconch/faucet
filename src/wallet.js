@@ -12,7 +12,6 @@ import {
   Panel,
   ProgressBar,
   Tooltip,
-  Well,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
@@ -21,6 +20,178 @@ import * as web3 from '@bitconch/bitconch-web3j';
 import {Settings} from './settings';
 
 const AIRDORP_QUOTA = 3000;
+
+class TokenSupplyInput extends React.Component {
+  state = {
+    value: '',
+    validationState: null,
+  };
+
+  getValidationState(value) {
+    const length = value.length;
+    if (length === 44) {
+      if (value.match(/^[0-9]+$/)) {
+        return 'success';
+      }
+      return 'error';
+    } else if (length > 44) {
+      return 'error';
+    } else if (length > 0) {
+      return 'warning';
+    }
+    return null;
+  }
+
+  handleChange(e) {
+    const {value} = e.target;
+    const validationState = this.getValidationState(value);
+    this.setState({value, validationState});
+  }
+
+  render() {
+    return (
+      <form>
+        <FormGroup validationState={this.state.validationState}>
+          <ControlLabel>创建数量</ControlLabel>
+          <FormControl type="text" value={this.state.value} placeholder="请输入创建Token的数量" onChange={(e) => this.handleChange(e)}/>
+          <FormControl.Feedback />
+        </FormGroup>
+      </form>
+    );
+  }
+}
+
+class TokenDecimalInput extends React.Component {
+  state = {
+    value: '',
+    validationState: null,
+  };
+
+  getValidationState(value) {
+    const length = value.length;
+    if (length === 10) {
+      if (value.match(/^[0-9]+$/)) {
+        return 'success';
+      }
+      return 'error';
+    } else if (length > 10) {
+      return 'error';
+    } else if (length > 0) {
+      return 'warning';
+    }
+    return null;
+  }
+
+  handleChange(e) {
+    const {value} = e.target;
+    const validationState = this.getValidationState(value);
+    this.setState({value, validationState});
+    this.props.onTokenDecimal(validationState === 'success' ? value : null);
+  }
+
+  render() {
+    return (
+      <form>
+        <FormGroup validationState={this.state.validationState}>
+          <ControlLabel>Decimal</ControlLabel>
+          <FormControl type="text" value={this.state.value} placeholder="请输入token decimal" onChange={(e) => this.handleChange(e)}/>
+          <FormControl.Feedback />
+        </FormGroup>
+      </form>
+    );
+  }
+}
+TokenDecimalInput.propTypes = {
+  onTokenDecimal: PropTypes.function,
+};
+
+class TokenNameInput extends React.Component {
+  state = {
+    value: '',
+    validationState: null,
+  };
+
+  getValidationState(value) {
+    const length = value.length;
+    if (length === 44) {
+      if (value.match(/^[A-Za-z0-9]+$/)) {
+        return 'success';
+      }
+      return 'error';
+    } else if (length > 44) {
+      return 'error';
+    } else if (length > 0) {
+      return 'warning';
+    }
+    return null;
+  }
+
+  handleChange(e) {
+    const {value} = e.target;
+    const validationState = this.getValidationState(value);
+    this.setState({value, validationState});
+    this.props.onTokenName(validationState === 'success' ? value : null);
+  }
+
+  render() {
+    return (
+      <form>
+        <FormGroup validationState={this.state.validationState}>
+          <ControlLabel>Token名称</ControlLabel>
+          <FormControl type="text" value={this.state.value} placeholder="请输入token名称" onChange={(e) => this.handleChange(e)}/>
+          <FormControl.Feedback />
+        </FormGroup>
+      </form>
+    );
+  }
+}
+TokenNameInput.propTypes = {
+  onTokenName: PropTypes.function,
+};
+
+class TokenSymbolInput extends React.Component {
+  state = {
+    value: '',
+    validationState: null,
+  };
+
+  getValidationState(value) {
+    const length = value.length;
+    if (length === 44) {
+      if (value.match(/^[A-Za-z0-9]+$/)) {
+        return 'success';
+      }
+      return 'error';
+    } else if (length > 44) {
+      return 'error';
+    } else if (length > 0) {
+      return 'warning';
+    }
+    return null;
+  }
+
+  handleChange(e) {
+    const {value} = e.target;
+    const validationState = this.getValidationState(value);
+    this.setState({value, validationState});
+    this.props.onTokenSymbol(validationState === 'success' ? value : null);
+  }
+
+  render() {
+    return (
+      <form>
+        <FormGroup validationState={this.state.validationState}>
+          <ControlLabel>Token符号</ControlLabel>
+          <FormControl type="text" value={this.state.value} placeholder="请输入token符号" onChange={(e) => this.handleChange(e)}/>
+          <FormControl.Feedback />
+        </FormGroup>
+      </form>
+    );
+  }
+}
+TokenSymbolInput.propTypes = {
+  onTokenSymbol: PropTypes.function,
+};
 
 class PublicKeyInput extends React.Component {
   state = {
@@ -53,17 +224,13 @@ class PublicKeyInput extends React.Component {
   render() {
     return (
       <form>
-        <FormGroup
-          validationState={this.state.validationState}
-        >
+        <FormGroup validationState={this.state.validationState}>
           <ControlLabel>收款人地址</ControlLabel>
-          <FormControl
-            type="text"
-            value={this.state.value}
-            placeholder="请输入收款人的地址"
-            onChange={(e) => this.handleChange(e)}
-          />
-          <FormControl.Feedback />
+          <InputGroup>
+            <InputGroup.Addon style={{backgroundColor: '#337ab7'}}><Glyphicon glyph="user" style={{color: '#FFF'}}/></InputGroup.Addon>
+            <FormControl type="text" value={this.state.value} placeholder="请输入收款人的地址" onChange={(e) => this.handleChange(e)}/>
+            <FormControl.Feedback />
+          </InputGroup>
         </FormGroup>
       </form>
     );
@@ -100,17 +267,13 @@ class TokenInput extends React.Component {
   render() {
     return (
       <form>
-        <FormGroup
-          validationState={this.state.validationState}
-        >
+        <FormGroup validationState={this.state.validationState}>
           <ControlLabel>数量</ControlLabel>
-          <FormControl
-            type="text"
-            value={this.state.value}
-            placeholder="请输入交易数量"
-            onChange={(e) => this.handleChange(e)}
-          />
-          <FormControl.Feedback />
+          <InputGroup>
+            <InputGroup.Addon style={{backgroundColor: '#337ab7'}}><Glyphicon glyph="align-left" style={{color: '#FFF'}}/></InputGroup.Addon>
+            <FormControl type="text" value={this.state.value} placeholder="请输入交易数量" onChange={(e) => this.handleChange(e)}/>
+            <FormControl.Feedback />
+          </InputGroup>
         </FormGroup>
       </form>
     );
@@ -152,16 +315,9 @@ class SignatureInput extends React.Component {
   render() {
     return (
       <form>
-        <FormGroup
-          validationState={this.state.validationState}
-        >
+        <FormGroup validationState={this.state.validationState}>
           <ControlLabel>签名</ControlLabel>
-          <FormControl
-            type="text"
-            value={this.state.value}
-            placeholder="请输入签名"
-            onChange={(e) => this.handleChange(e)}
-          />
+          <FormControl type="text" value={this.state.value} placeholder="请输入签名" onChange={(e) => this.handleChange(e)}/>
           <FormControl.Feedback />
         </FormGroup>
       </form>
@@ -224,19 +380,15 @@ BusyModal.propTypes = {
 class SettingsModal extends React.Component {
   render() {
     return (
-      <Modal
-        {...this.props}
-        bsSize="large"
-        aria-labelledby="contained-modal-title-lg"
-      >
+      <Modal {...this.props} bsSize="large" aria-labelledby="contained-modal-title-lg">
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-lg">设置</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{padding:'0px'}}>
           <Settings store={this.props.store} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.onHide}>Close</Button>
+          <Button onClick={this.props.onHide}>关闭</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -258,6 +410,12 @@ export class Wallet extends React.Component {
     recipientAmount: null,
     confirmationSignature: null,
     transactionConfirmed: null,
+    tokenSupply: 0,
+    tokenName: null,
+    tokenSymbol: null,
+    tokenDecimal: 0,
+    tokenAmount: 0,
+    newTokenAcountAddr: null,
   };
 
   constructor(props) {
@@ -350,6 +508,15 @@ export class Wallet extends React.Component {
       }
     );
   }
+  resetAccount() {
+    this.runModal(
+      '申请新账户',
+      '请稍后...',
+      async () => {
+        await this.props.store.createAccount();
+      }
+    );
+  }
 
   sendTransaction() {
     this.runModal(
@@ -387,6 +554,31 @@ export class Wallet extends React.Component {
     );
   }
 
+  createNewToken() {
+    this.runModal(
+      '创建NewToken',
+      '请稍后...',
+      async () => {
+        var buf = Buffer.allocUnsafe(4);
+        buf.writeUInt16BE(10);
+        const supply = new web3.TokenAmount.fromBuffer(buf);
+        const [token, pubkey] = await web3.Token.createNewToken(
+          this.web3sol,
+          this.web3solAccount,
+          supply,
+          this.state.tokenName,
+          this.state.tokenSymbol,
+          this.state.tokenDecimal,
+        );
+        const newTokenAccountInfo = await token.accountInfo(pubkey);
+        this.setState({
+          tokenAmount: newTokenAccountInfo.amount,
+          newTokenAcountAddr: pubkey,
+        });
+      }
+    );
+  }
+
   render() {
     const copyTooltip = (
       <Tooltip id="clipboard">
@@ -413,59 +605,59 @@ export class Wallet extends React.Component {
       <BusyModal show title={this.state.busyModal.title} text={this.state.busyModal.text} /> : null;
 
     const settingsModal = this.state.settingsModal ?
-      <SettingsModal
-        show
-        store={this.props.store}
-        onHide={() => this.setState({settingsModal: false})}
-      /> : null;
+      <SettingsModal show store={this.props.store} onHide={() => this.setState({settingsModal: false})}/> : null;
 
     const sendDisabled = this.state.recipientPublicKey === null || this.state.recipientAmount === null;
     const airdropDisabled = this.state.balance !== 0;
 
     return (
       <div>
-        <div style={{width: '100%', textAlign: 'right'}}>
-          <Button onClick={() => this.setState({settingsModal: true})}>
-            <Glyphicon
-              style={{backgroundColor: 'white'}}
-              glyph="menu-hamburger"
-            />
-          </Button>
-        </div>
         {busyModal}
         {settingsModal}
         <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
-        <Well>
-          账户地址:
-          <FormGroup>
-            <InputGroup>
-              <FormControl readOnly type="text" size="21" value={this.web3solAccount.publicKey}/>
-              <InputGroup.Button>
-                <OverlayTrigger placement="bottom" overlay={copyTooltip}>
-                  <Button onClick={() => this.copyPublicKey()}>
-                    <Glyphicon glyph="copy" />
-                  </Button>
-                </OverlayTrigger>
-              </InputGroup.Button>
-            </InputGroup>
-          </FormGroup>
-          <p/>
-          账户余额: {this.state.balance}&nbsp;BUS &nbsp;
-          <p/>
-          <OverlayTrigger placement="top" overlay={refreshBalanceTooltip}>
-            <Button onClick={() => this.refreshBalance()}>
-              <Glyphicon glyph="refresh" />
+        <Panel>
+          <Panel.Heading>
+            账户信息
+            <Button onClick={() => this.setState({settingsModal: true})} bsSize="small" bsStyle="primary" style={{float: 'right',marginTop:'-5px'}}>
+              <Glyphicon glyph="cog"/>
             </Button>
-          </OverlayTrigger>
-          <OverlayTrigger placement="bottom" overlay={airdropTooltip}>
-            <Button disabled={airdropDisabled} onClick={() => this.requestAirdrop()}>
-              <Glyphicon glyph="send" />
-            </Button>
-          </OverlayTrigger>
-          <OverlayTrigger placement="bottom" overlay={resetTooltip}>
-            <Button bsStyle="danger" onClick={() => this.resetAccount()}><Glyphicon glyph="info-sign" /></Button>
-          </OverlayTrigger>
-        </Well>
+          </Panel.Heading>
+          <Panel.Body>
+            <div>
+              账户地址:
+            </div>
+            <FormGroup>
+              <InputGroup>
+                <InputGroup.Addon style={{backgroundColor: '#337ab7'}}><Glyphicon glyph="user" style={{color: '#FFF'}}/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value={this.web3solAccount.publicKey}/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+            </FormGroup>
+            <p/>
+            账户余额: {this.state.balance}&nbsp;BUS &nbsp;
+            <OverlayTrigger placement="top" overlay={refreshBalanceTooltip}>
+              <Button onClick={() => this.refreshBalance()}>
+                <Glyphicon glyph="refresh" />
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger placement="bottom" overlay={airdropTooltip}>
+              <Button disabled={airdropDisabled} onClick={() => this.requestAirdrop()}>
+                <Glyphicon glyph="arrow-down" />
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger placement="bottom" overlay={resetTooltip}>
+              <Button bsStyle="danger" onClick={() => this.resetAccount()}>
+                <Glyphicon glyph="repeat" />
+              </Button>
+            </OverlayTrigger>
+          </Panel.Body>
+        </Panel>
         <p/>
         <Panel>
           <Panel.Heading>交易</Panel.Heading>
@@ -474,6 +666,24 @@ export class Wallet extends React.Component {
             <TokenInput onAmount={(amount) => this.setRecipientAmount(amount)}/>
             <div className="text-center">
               <Button disabled={sendDisabled} onClick={() => this.sendTransaction()}>发送</Button>
+            </div>
+          </Panel.Body>
+        </Panel>
+        <p/>
+        <Panel>
+          <Panel.Heading>创建NewToken</Panel.Heading>
+          <Panel.Body>
+            <TokenSupplyInput />
+            <TokenNameInput />
+            <TokenSymbolInput />
+            <TokenDecimalInput />
+            <p/>
+            NewToken账户地址:{this.state.newTokenAcountAddr}&nbsp;
+            <p/>
+            数量:{this.state.tokenAmount}&nbsp;
+            <p/>
+            <div className="text-center">
+              <Button onClick={() => this.createNewToken()}>创建</Button>
             </div>
           </Panel.Body>
         </Panel>
