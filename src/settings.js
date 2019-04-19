@@ -84,9 +84,7 @@ export class Settings extends React.Component {
         <Panel>
           <Panel.Heading>网络设置</Panel.Heading>
           <Panel.Body>
-            <FormGroup
-              validationState={this.state.validationState}
-            >
+            <FormGroup validationState={this.state.validationState}>
               <InputGroup>
                 <DropdownButton
                   componentClass={InputGroup.Button}
