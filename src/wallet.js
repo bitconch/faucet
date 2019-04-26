@@ -161,7 +161,6 @@ class SercetkeyInput extends React.Component {
     return (
       <form>
         <FormGroup validationState={this.state.validationState}>
-          <ControlLabel>导入密钥</ControlLabel>
           <FormControl
             type="text"
             value={this.state.value}
@@ -622,31 +621,21 @@ BusyModal.propTypes = {
 class ExportSercetModal extends React.Component {
   render() {
     return (
-      <Modal
-        {...this.props}
-        bsSize="large"
-        aria-labelledby="contained-modal-title-lg"
-      >
+      <Modal {...this.props} bsSize="large" aria-labelledby="contained-modal-title-lg">
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-lg">切换账户</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div>
             <Panel>
-              <Panel.Heading></Panel.Heading>
+              <Panel.Heading>导入密钥</Panel.Heading>
               <Panel.Body>
                 <FormGroup>
-                  <InputGroup>
-                    <SercetkeyInput
-                      onSercetkey={key => this.props.exsecretkey(key)}
-                    />
-                    <Button
-                      onClick={() => this.props.updateaccount()}
-                    >
-                      <Glyphicon glyph="export" />
-                      导入
-                    </Button>
-                  </InputGroup>
+                  <SercetkeyInput onSercetkey={key => this.props.exsecretkey(key)}/>
+                  <Button onClick={() => this.props.updateaccount()}>
+                    <Glyphicon glyph="import" />
+                    导入
+                  </Button>
                 </FormGroup>
               </Panel.Body>
             </Panel>
@@ -664,7 +653,6 @@ ExportSercetModal.propTypes = {
   exsecretkey: PropTypes.function,
   onHide: PropTypes.function,
   updateaccount:PropTypes.function,
-
 };
 
 class SettingsModal extends React.Component {
