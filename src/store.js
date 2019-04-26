@@ -36,6 +36,12 @@ export class Store {
     await this._lf.setItem('accountSecretKey', account.secretKey);
   }
 
+  async exportAccount(value) {
+    this.accountSecretKey = value;//密钥
+    this._ee.emit('change');
+    await this._lf.setItem('accountSecretKey', value);
+  }
+
   async setNetworkEntryPoint(value) {
     this.networkEntryPoint = value;
     this._ee.emit('change');
