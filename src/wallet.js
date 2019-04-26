@@ -126,6 +126,52 @@ DestinationTokenAccountPubKeyInput.propTypes = {
   onDestinationTokenAccountPubKey: PropTypes.function,
 };
 
+class SercetkeyInput extends React.Component {
+  state = {
+    value: '',
+    validationState: null,
+  };
+
+  getValidationState(value) {
+    var array = value.split(',');
+    if (array.length === 64) {
+      return 'success';
+    }else if (array.length <= 64){
+      return 'warning';
+    }else if (array.length > 64){
+      return 'error';
+    }else{
+      return null;
+    }
+  }
+  handleChange(e) {
+    const {value} = e.target;
+    const validationState = this.getValidationState(value);
+    this.setState({value, validationState});
+    this.props.onSercetkey(validationState === 'success' ? value : null);
+  }
+
+  render() {
+    return (
+      <form>
+        <FormGroup validationState={this.state.validationState}>
+          <ControlLabel>导入密钥</ControlLabel>
+          <FormControl
+            type="text"
+            value={this.state.value}
+            placeholder="请输入您的密钥"
+            onChange={e => this.handleChange(e)}
+          />
+          <FormControl.Feedback />
+        </FormGroup>
+      </form>
+    );
+  }
+}
+SercetkeyInput.propTypes = {
+  onSercetkey: PropTypes.function,
+};
+
 class TransferTokenNumberInput extends React.Component {
   state = {
     value: '',
@@ -552,6 +598,53 @@ BusyModal.propTypes = {
   text: PropTypes.string,
 };
 
+class ExportSercetModal extends React.Component {
+  render() {
+    return (
+      <Modal
+        {...this.props}
+        bsSize="large"
+        aria-labelledby="contained-modal-title-lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-lg">切换账户</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <Panel>
+              <Panel.Heading></Panel.Heading>
+              <Panel.Body>
+                <FormGroup>
+                  <InputGroup>
+                    <SercetkeyInput
+                      onSercetkey={key => this.props.exsecretkey(key)}
+                    />
+                    <Button
+                      onClick={() => this.props.updateaccount()}
+                    >
+                      <Glyphicon glyph="export" />
+                      导入
+                    </Button>
+                  </InputGroup>
+                </FormGroup>
+              </Panel.Body>
+            </Panel>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.props.onHide}>关闭</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+}
+
+ExportSercetModal.propTypes = {
+  exsecretkey: PropTypes.function,
+  onHide: PropTypes.function,
+  updateaccount:PropTypes.function,
+
+};
 
 class SettingsModal extends React.Component {
   render() {
@@ -581,6 +674,8 @@ export class Wallet extends React.Component {
     errors: [],
     busyModal: null,
     settingsModal: false,
+    exportSercetModal:false,
+    mysecretKey:null,
     balance: 0,
     recipientPublicKey: null,
     recipientAmount: null,
@@ -688,7 +783,19 @@ export class Wallet extends React.Component {
   componentWillUnmount() {
     this.props.store.removeChangeListener(this.onStoreChange);
   }
-
+  setMySerectkey(mysecretKey){
+    this.setState({mysecretKey});
+  }
+  async getAcount(){
+    let str = this.state.mysecretKey;
+    var array = str.split(',');
+    if (array.length === 64) {
+      var typedArray = new Uint8Array(array);
+      await this.props.store.exportAccount(typedArray);
+      this.refreshBalance();
+      this.setState({exportSercetModal:false});
+    }
+  }
   copyPublicKey() {
     copy(this.web3solAccount.publicKey);
   }
@@ -829,6 +936,11 @@ export class Wallet extends React.Component {
     );
   }
 
+  exportPrivateKey() {
+    copy(this.web3solAccount.secretKey);
+  }
+
+
   confirmTransaction() {
     this.runModal(
       '交易确认',
@@ -865,6 +977,16 @@ export class Wallet extends React.Component {
         申请新账户
       </Tooltip>
     );
+    const exportTooltip = (
+      <Tooltip id="exportprivate">
+        导出密钥(复制到剪贴板)
+      </Tooltip>
+    );
+    const changeTooltip = (
+      <Tooltip id="importprivate">
+        切换账户(导入密钥)
+      </Tooltip>
+    );
     const createNewTokenAccounttip = (
       <Tooltip id="newtokenaccount">
         申请Token账户
@@ -873,7 +995,14 @@ export class Wallet extends React.Component {
 
     const busyModal = this.state.busyModal ?
       <BusyModal show title={this.state.busyModal.title} text={this.state.busyModal.text} /> : null;
-
+    const exportSercetModal = this.state.exportSercetModal ? (
+      <ExportSercetModal
+        show
+        onHide={() => this.setState({exportSercetModal: false})}
+        updateaccount={() => this.getAcount()}
+        exsecretkey={key => this.setMySerectkey(key)}
+      />
+    ) : null;
     const settingsModal = this.state.settingsModal ?
       <SettingsModal show store={this.props.store} onHide={() => this.setState({settingsModal: false})}/> : null;
 
@@ -887,6 +1016,7 @@ export class Wallet extends React.Component {
       <div>
         {busyModal}
         {settingsModal}
+        {exportSercetModal}
         <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
         <Panel>
           <Panel.Heading>
@@ -927,6 +1057,16 @@ export class Wallet extends React.Component {
             <OverlayTrigger placement="bottom" overlay={resetTooltip}>
               <Button bsStyle="danger" onClick={() => this.resetAccount()}>
                 <Glyphicon glyph="repeat" />
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger placement="bottom" overlay={exportTooltip}>
+              <Button  onClick={() => this.exportPrivateKey()} style={{float: 'right'}}>
+                <Glyphicon glyph="export" />
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger placement="bottom" overlay={changeTooltip}>
+              <Button  onClick={() => this.setState({exportSercetModal: true})} style={{float: 'right'}}>
+                <Glyphicon glyph="import" />
               </Button>
             </OverlayTrigger>
           </Panel.Body>
