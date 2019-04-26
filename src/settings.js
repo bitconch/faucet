@@ -10,7 +10,7 @@ import {
   Panel,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import * as web3 from '@bitconch/bitconch-web3j';
+import * as web3 from '@solana/web3.js';
 
 export class Settings extends React.Component {
   forceUpdate = () => {
@@ -75,6 +75,9 @@ export class Settings extends React.Component {
 
   async resetAccount() {
     await this.props.store.createAccount();
+    this.setState({
+      balance: await this.web3sol.getBalance(this.web3solAccount.publicKey),
+    });
   }
 
   render() {

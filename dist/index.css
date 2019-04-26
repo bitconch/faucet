@@ -41,3 +41,9 @@ body {
 .input_width {
   width: 500px;
 }
+
+.input_img {
+  padding: 3px;
+  background-color: #337ab7;
+  border: none;
+}
