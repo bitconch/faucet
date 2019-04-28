@@ -48,8 +48,8 @@ class TokenAsset extends React.Component {
       };
 
       var i;
-      var tem = '';
-      var msg = '';
+      // var tem = '';
+      // var msg = '';
       var arrToken = [];
       for(i = 0; i < data.TokenPublicKeys.length; i++) {
         var tokenpubkey = new web3.PublicKey(data.TokenPublicKeys[i].tokenpubkey);
@@ -60,12 +60,12 @@ class TokenAsset extends React.Component {
         var tokensupply = acc.supply;
         var tokendecimal = acc.decimals;
 
-        tem += '  代币名称: {' + i + '}  ';
+        // tem += '  代币名称: {' + i + '}  ';
 
         var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
         var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
 
-        tem += '余额: ' + accTokenInfo.amount;
+        // tem += '余额: ' + accTokenInfo.amount;
 
         arrToken.push({
           tokenpubkey,
@@ -77,13 +77,13 @@ class TokenAsset extends React.Component {
           accTokenInfo
         });
 
-        msg += String.format(
-          tem,
-          acc.name
-        );
+        // msg += String.format(
+        //   tem,
+        //   acc.name
+        // );
       }
       this.setState({
-        tokenInfo: msg,
+        // tokenInfo: msg,
         tokenNameArray: arrToken,
       });
     } catch (err)
@@ -92,10 +92,11 @@ class TokenAsset extends React.Component {
     }
   }
 
-  setTokenInfo(token) {
+  async setTokenInfo(token) {
     var tem = '';
     var msg = '';
-
+    var to = new web3.Token(this.props.conn, token.tokenpubkey);
+    var tokenacc = await to.accountInfo(new web3.PublicKey(token.tokenaccpubkey));
     String.format = function(src){
       if (arguments.length == 0) return null;
       var args = Array.prototype.slice.call(arguments, 1);
@@ -110,7 +111,7 @@ class TokenAsset extends React.Component {
     msg += String.format(
       tem,
       token.tokenname,
-      token.accTokenInfo.amount
+      tokenacc.amount
     );
     this.setState({
       tokenInfo: msg,
@@ -498,13 +499,23 @@ class TokenNameInput extends React.Component {
   };
   getValidationState(value) {
     const length = value.length;
-    if (length === 0) {
-      return 'bitconch';
-    }
-    if (value.match(/^[A-Za-z0-9]+$/)) {
+    // if (length === 0) {
+    //   return 'bitconch';
+    // }
+    // if (value.match(/^[A-Za-z0-9]+$/)) {
+    //   return 'success';
+    // }
+    // if (length > 44) {
+    //   return 'error';
+    // }
+    // return null;
+    if (length > 0) {
+      // if (value.match(/^[A-Za-z0-9]+$/)) {
+      //   return 'success';
+      // }
+      // return 'error';
       return 'success';
-    }
-    if (length > 44) {
+    } else if (length > 44) {
       return 'error';
     }
     return null;
@@ -551,10 +562,11 @@ class TokenSymbolInput extends React.Component {
   getValidationState(value) {
     const length = value.length;
     if (length > 0) {
-      if (value.match(/^[A-Za-z0-9]+$/)) {
-        return 'success';
-      }
-      return 'error';
+      // if (value.match(/^[A-Za-z0-9]+$/)) {
+      //   return 'success';
+      // }
+      // return 'error';
+      return 'success';
     } else if (length > 44) {
       return 'error';
     }
@@ -849,10 +861,10 @@ export class Wallet extends React.Component {
     recipientAmount: null,
     confirmationSignature: null,
     transactionConfirmed: null,
-    tokenSupply: new web3.TokenAmount(100),
-    tokenName: 'bitconch',
-    tokenSymbol: 'w',
-    tokenDecimal: 2,
+    tokenSupply: new web3.TokenAmount(0),
+    tokenName: null,
+    tokenSymbol: null,
+    tokenDecimal: 0,
     tokenAmount: 0,
     newTokenAcountAddr: null,
     sourceTokenAccountPublicKey: null,
@@ -1323,7 +1335,7 @@ export class Wallet extends React.Component {
             <TokenAsset conn={this.web3sol} onTokenAsset={(tokenAccPubkey) => this.setSourceTokenAccountPublicKey(tokenAccPubkey)}/>
             <TransferTokenNumberInput onTransferTokenNumber={(num) => this.setTransferTokenAmount(num)}/>
             <p/>
-            余额:&nbsp; {this.state.sourceTokenAccountTokenAmount}&nbsp;
+            {/* 余额:&nbsp; {this.state.sourceTokenAccountTokenAmount}&nbsp; */}
             <p/>
             新建代币账户地址:
             <FormGroup>
