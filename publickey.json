@@ -1,0 +1,14 @@
+{
+    "AccountPublicKey": "2EdJJzcrKrB9DXypghbR1npqyZMPYEnT43oix6Abgw7S",
+    "AccountSecreKey": "107,143,235,119,147,182,152,17,156,227,125,249,233,187,154,227,103,199,194,228,106,30,131,224,186,254,206,128,134,22,226,90,18,89,71,189,125,161,45,49,164,0,229,88,172,190,118,118,43,92,6,164,3,212,226,196,162,140,148,167,62,70,23,165",
+    "TokenPublicKeys": [
+        {
+            "tokenpubkey": "FqCoK8mpX29oD5KLkgNPGyCVg1QfvzYKxjPsNDMMMSU2",
+            "tokenaccountpubkey": "ZE7hV9aBS55R4yfBeuDQ9fxyRGxuXLcHiteEn1EhhhL"
+        },
+        {
+            "tokenpubkey": "HR6wgvFg5hKmsfSRsXKHZhCbgqv8FfziR3eQ9wWYHJDV",
+            "tokenaccountpubkey": "7JcGp9QZ4TZdyf1HejuUzoiWaZ4Pj5Mfu2KV94RLqfkQ"
+        }
+    ]
+}
