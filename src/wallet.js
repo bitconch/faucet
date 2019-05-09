@@ -12,14 +12,172 @@ import {
   Panel,
   ProgressBar,
   Tooltip,
+  DropdownButton,
+  MenuItem,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
 import * as web3 from '@solana/web3.js';
 
 import {Settings} from './settings';
+import data from '../publickey.json';
 
 const AIRDORP_QUOTA = 3000;
+
+class TokenAsset extends React.Component {
+  state = {
+    value: '',
+    validationState: null,
+    tokenInfo: null,
+    tokenNameArray: [],
+  };
+
+  constructor(props) {
+    super(props);
+    this.readPublicKeyFromFile();
+  }
+
+  async readPublicKeyFromFile() {
+    try {
+      String.format = function(src){
+        if (arguments.length == 0) return null;
+        var args = Array.prototype.slice.call(arguments, 1);
+        return src.replace(/\{(\d+)\}/g, function(m, i){
+          return args[i];
+        });
+      };
+
+      var i;
+      // var tem = '';
+      // var msg = '';
+      var arrToken = [];
+      for(i = 0; i < data.TokenPublicKeys.length; i++) {
+        var tokenpubkey = new web3.PublicKey(data.TokenPublicKeys[i].tokenpubkey);
+        var token = new web3.Token(this.props.conn, tokenpubkey);
+        var acc = await token.tokenInfo();
+        var tokenname = acc.name;
+        var tokensymbol = acc.symbol;
+        var tokensupply = acc.supply;
+        var tokendecimal = acc.decimals;
+
+        // tem += '  代币名称: {' + i + '}  ';
+
+        var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
+        var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
+
+        // tem += '余额: ' + accTokenInfo.amount;
+
+        arrToken.push({
+          tokenpubkey,
+          tokenname,
+          tokensymbol,
+          tokensupply,
+          tokendecimal,
+          tokenaccpubkey,
+          accTokenInfo
+        });
+
+        // msg += String.format(
+        //   tem,
+        //   acc.name
+        // );
+      }
+      this.setState({
+        // tokenInfo: msg,
+        tokenNameArray: arrToken,
+      });
+    } catch (err)
+    {
+      this.addError(err.message);
+    }
+  }
+
+  async setTokenInfo(token) {
+    var tem = '';
+    var msg = '';
+    var to = new web3.Token(this.props.conn, token.tokenpubkey);
+    var tokenacc = await to.accountInfo(new web3.PublicKey(token.tokenaccpubkey));
+    String.format = function(src){
+      if (arguments.length == 0) return null;
+      var args = Array.prototype.slice.call(arguments, 1);
+      return src.replace(/\{(\d+)\}/g, function(m, i){
+        return args[i];
+      });
+    };
+
+    tem += '代币名称: {0}   ' +
+    '余额: {1}';
+
+    msg += String.format(
+      tem,
+      token.tokenname,
+      tokenacc.amount
+    );
+    this.setState({
+      tokenInfo: msg,
+    });
+    this.props.onTokenAsset(token);
+  }
+
+  getValidationState(value) {
+    const length = value.length;
+    if (length === 44) {
+      if (value.match(/^[A-Za-z0-9]+$/)) {
+        return 'success';
+      }
+      return 'error';
+    } else if (length > 44) {
+      return 'error';
+    } else if (length > 0) {
+      return 'warning';
+    }
+    return null;
+  }
+
+  handleChange(e) {
+    const {value} = e.target;
+    const validationState = this.getValidationState(value);
+    this.setState({
+      value: value,
+      validationState: validationState,
+    });
+
+    this.props.onTokenAsset(validationState === 'success' ? value : null);
+  }
+
+  render() {
+    return (
+      <form>
+        <FormGroup
+          validationState={this.state.validationState}
+        >
+          {/* <ControlLabel>资产</ControlLabel> */}
+          <DropdownButton
+            componentClass={InputGroup.Button}
+            title="资产"
+            onSelect={::this.setTokenInfo}
+          >
+            {
+              this.state.tokenNameArray.map((obj, index) => <MenuItem key={index} eventKey={obj}>{obj.tokenname}</MenuItem>)
+            }
+          </DropdownButton>
+          <FormControl
+            readOnly
+            type="text"
+            size="21"
+            value={this.state.tokenInfo}
+          />
+          <FormControl.Feedback />
+        </FormGroup>
+      </form>
+    );
+  }
+}
+
+TokenAsset.propTypes = {
+  onTokenAsset: PropTypes.function,
+  conn: PropTypes.object,
+};
 
 class SourceTokenAccountPubKeyInput extends React.Component {
   state = {
@@ -55,13 +213,13 @@ class SourceTokenAccountPubKeyInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Source token account PublicKey</ControlLabel>
+          <ControlLabel>源地址</ControlLabel>
           <InputGroup>
             <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/send_token.png"/></InputGroup.Addon>
             <FormControl
               type="text"
               value={this.state.value}
-              placeholder="请输入发送人Token地址"
+              placeholder="请输入源地址"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
@@ -74,6 +232,7 @@ class SourceTokenAccountPubKeyInput extends React.Component {
 
 SourceTokenAccountPubKeyInput.propTypes = {
   onSourceTokenAccountPubKey: PropTypes.function,
+  tokenObj: PropTypes.object,
 };
 
 class DestinationTokenAccountPubKeyInput extends React.Component {
@@ -110,18 +269,19 @@ class DestinationTokenAccountPubKeyInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Destination token account PublicKey</ControlLabel>
+          <ControlLabel>目标地址</ControlLabel>
           <InputGroup>
             <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/receive_token.png"/></InputGroup.Addon>
             <FormControl
               type="text"
               id="desttokenaccountpubkey"
               value={this.state.value}
-              placeholder="请输入接收人Token地址"
+              placeholder="请输入目标地址"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
           </InputGroup>
+
         </FormGroup>
       </form>
     );
@@ -207,13 +367,13 @@ class TransferTokenNumberInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Number of tokens to transfer</ControlLabel>
+          <ControlLabel>转账数量</ControlLabel>
           <InputGroup>
             <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_num.png"/></InputGroup.Addon>
             <FormControl
               type="text"
               value={this.state.value}
-              placeholder="请输入转账Token数量"
+              placeholder="请输入转账数量"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
@@ -266,7 +426,7 @@ class TokenSupplyInput extends React.Component {
             <FormControl
               type="text"
               value={this.state.value}
-              placeholder="请输入创建Token的数量"
+              placeholder="请输入创建数量"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
@@ -312,13 +472,13 @@ class TokenDecimalInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Decimal</ControlLabel>
+          <ControlLabel>小数点</ControlLabel>
           <InputGroup>
             <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_decimal.png"/></InputGroup.Addon>
             <FormControl
               type="text"
               value={this.state.value}
-              placeholder="请输入token decimal"
+              placeholder="请输入小数点位数"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
@@ -339,13 +499,23 @@ class TokenNameInput extends React.Component {
   };
   getValidationState(value) {
     const length = value.length;
-    if (length === 0) {
-      return 'bitconch';
-    }
-    if (value.match(/^[A-Za-z0-9]+$/)) {
+    // if (length === 0) {
+    //   return 'bitconch';
+    // }
+    // if (value.match(/^[A-Za-z0-9]+$/)) {
+    //   return 'success';
+    // }
+    // if (length > 44) {
+    //   return 'error';
+    // }
+    // return null;
+    if (length > 0) {
+      // if (value.match(/^[A-Za-z0-9]+$/)) {
+      //   return 'success';
+      // }
+      // return 'error';
       return 'success';
-    }
-    if (length > 44) {
+    } else if (length > 44) {
       return 'error';
     }
     return null;
@@ -364,13 +534,13 @@ class TokenNameInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Token名称</ControlLabel>
+          <ControlLabel>名称</ControlLabel>
           <InputGroup>
             <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_name.png"/></InputGroup.Addon>
             <FormControl
               type="text"
               value={this.state.value}
-              placeholder="请输入token名称"
+              placeholder="请输入名称"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
@@ -392,10 +562,11 @@ class TokenSymbolInput extends React.Component {
   getValidationState(value) {
     const length = value.length;
     if (length > 0) {
-      if (value.match(/^[A-Za-z0-9]+$/)) {
-        return 'success';
-      }
-      return 'error';
+      // if (value.match(/^[A-Za-z0-9]+$/)) {
+      //   return 'success';
+      // }
+      // return 'error';
+      return 'success';
     } else if (length > 44) {
       return 'error';
     }
@@ -415,13 +586,13 @@ class TokenSymbolInput extends React.Component {
         <FormGroup
           validationState={this.state.validationState}
         >
-          <ControlLabel>Token符号</ControlLabel>
+          <ControlLabel>符号</ControlLabel>
           <InputGroup>
             <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_symbol.png"/></InputGroup.Addon>
             <FormControl
               type="text"
               value={this.state.value}
-              placeholder="请输入token符号"
+              placeholder="请输入符号"
               onChange={(e) => this.handleChange(e)}
             />
             <FormControl.Feedback />
@@ -690,10 +861,10 @@ export class Wallet extends React.Component {
     recipientAmount: null,
     confirmationSignature: null,
     transactionConfirmed: null,
-    tokenSupply: new web3.TokenAmount(100),
-    tokenName: 'bitconch',
-    tokenSymbol: 'w',
-    tokenDecimal: 2,
+    tokenSupply: new web3.TokenAmount(0),
+    tokenName: null,
+    tokenSymbol: null,
+    tokenDecimal: 0,
     tokenAmount: 0,
     newTokenAcountAddr: null,
     sourceTokenAccountPublicKey: null,
@@ -703,6 +874,10 @@ export class Wallet extends React.Component {
     destTokenAccountTokenAmount: 0,
     tokenObj: null,
     newTokenAccountPublicKey: null,
+    createdTokenInfoList: [],
+    tokenAccountPubkeyList: [],
+    tokenInfoInnerHtml: null,
+    tokenNameArray: [],
   };
 
   constructor(props) {
@@ -717,9 +892,12 @@ export class Wallet extends React.Component {
     });
   }
 
-  setSourceTokenAccountPublicKey(sourceTokenAccountPublicKey) {
-    this.setState({sourceTokenAccountPublicKey});
-  }
+  setSourceTokenAccountPublicKey(token) {
+    var to = new web3.Token(this.web3sol, token.tokenpubkey);
+    this.setState({
+      sourceTokenAccountPublicKey: token.tokenaccpubkey,
+      tokenObj: to
+    });  }
 
   setDestTokenAccountPublicKey(destTokenAccountPublicKey) {
     this.setState({destTokenAccountPublicKey});
@@ -792,9 +970,11 @@ export class Wallet extends React.Component {
   componentWillUnmount() {
     this.props.store.removeChangeListener(this.onStoreChange);
   }
+
   setMySerectkey(mysecretKey){
     this.setState({mysecretKey});
   }
+
   async getAcount(){
     let str = this.state.mysecretKey;
     var array = str.split(',');
@@ -805,6 +985,7 @@ export class Wallet extends React.Component {
       this.setState({exportSercetModal:false});
     }
   }
+
   copyPublicKey() {
     copy(this.web3solAccount.publicKey);
   }
@@ -922,14 +1103,22 @@ export class Wallet extends React.Component {
           this.state.tokenSymbol,
           this.state.tokenDecimal,
         );
+        alert('token publickey: ' + token.token);
         this.setState({
           tokenObj: token,
         });
         const newTokenAccountInfo = await token.accountInfo(pubkey);
         var tokenAmount = newTokenAccountInfo.amount;
+
+        var arr = this.state.createdTokenInfoList;
+        arr.push({token, pubkey});
+        var arr_pubkey = this.state.tokenAccountPubkeyList;
+        arr_pubkey.push(pubkey);
         this.setState({
           tokenAmount: tokenAmount.toString(),
           newTokenAcountAddr: pubkey.toString(),
+          createdTokenInfoList: arr,
+          tokenAccountPubkeyList: arr_pubkey,
         });
       }
     );
@@ -1102,13 +1291,13 @@ export class Wallet extends React.Component {
         <Panel>
           <Panel.Heading>
             <img src="img/new_token.png"/>
-            创建NewToken
+            创建代币
           </Panel.Heading>
           <Panel.Body>
             <TokenSupplyInput onTokenSupply={(supply) => this.setTokenSupply(supply)}/>
             <TokenNameInput onTokenName={(name) => this.setTokenName(name)}/>
             <TokenSymbolInput onTokenSymbol={(symbol) => this.setTokenSymbol(symbol)}/>
-            <TokenDecimalInput onTokenDecimal={(decimal) => this.setTokenSymbol(decimal)}/>
+            <TokenDecimalInput onTokenDecimal={(decimal) => this.setTokenDecimal(decimal)}/>
             <p/>
             NewToken存放账户地址:
             <FormGroup>
@@ -1136,18 +1325,19 @@ export class Wallet extends React.Component {
         <Panel>
           <Panel.Heading>
             <img src="img/transfer_token.png"/>
-            Transfer Token
+            发送代币
           </Panel.Heading>
           <Panel.Body>
-            <SourceTokenAccountPubKeyInput onSourceTokenAccountPubKey={(sourcekey) => this.setSourceTokenAccountPublicKey(sourcekey)}/>
+          源地址:
+            <p/>
+            <FormControl readOnly type="text" size="21" value={this.state.sourceTokenAccountPublicKey}/>
             <DestinationTokenAccountPubKeyInput onDestinationTokenAccountPubKey={(destkey) => this.setDestTokenAccountPublicKey(destkey)}/>
+            <TokenAsset conn={this.web3sol} onTokenAsset={(tokenAccPubkey) => this.setSourceTokenAccountPublicKey(tokenAccPubkey)}/>
             <TransferTokenNumberInput onTransferTokenNumber={(num) => this.setTransferTokenAmount(num)}/>
             <p/>
-            发送人剩余Token数量:&nbsp; {this.state.sourceTokenAccountTokenAmount}&nbsp;
+            {/* 余额:&nbsp; {this.state.sourceTokenAccountTokenAmount}&nbsp; */}
             <p/>
-            接收人剩余Token数量:&nbsp; {this.state.destTokenAccountTokenAmount}&nbsp;
-            <p/>
-            新建Token账户地址:
+            新建代币账户地址:
             <FormGroup>
               <InputGroup>
                 <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
@@ -1169,7 +1359,7 @@ export class Wallet extends React.Component {
               </Button>
             </OverlayTrigger>
             <div className="text-center">
-              <Button disabled={transferDisabled} onClick={() => this.transferToken()}>Transfer</Button>
+              <Button disabled={transferDisabled} onClick={() => this.transferToken()}>发送</Button>
             </div>
           </Panel.Body>
         </Panel>
