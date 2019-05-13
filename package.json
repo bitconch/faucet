@@ -39,7 +39,7 @@
     "webpack-dev-server": "^3.1.5"
   },
   "dependencies": {
-    "@bitconch/bitconch-web3j": "1.0.0",
+    "@bitconch/bitconch-web3j": "1.1.2",
     "@solana/web3.js": "0.14.17",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
