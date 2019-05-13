@@ -17,7 +17,8 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
-import * as web3 from '@solana/web3.js';
+// import * as web3 from '@solana/web3.js';
+import * as web3 from '@bitconch/bitconch-web3j';
 
 import {Settings} from './settings';
 import data from '../publickey.json';
@@ -885,6 +886,18 @@ export class Wallet extends React.Component {
     this.onStoreChange();
   }
 
+  getTokenDetails(){
+    var i;
+    // var tem = '';
+    // var msg = '';
+    var arrTokenDetails = [];
+    for(i = 0; i < data.TokenDetail.length; i++) {
+      arrTokenDetails.push(data.TokenDetail[i]);
+    }
+    alert(arrTokenDetails);
+    return arrTokenDetails;
+  }
+
   setConfirmationSignature(confirmationSignature) {
     this.setState({
       transactionConfirmed: null,
@@ -1361,6 +1374,172 @@ export class Wallet extends React.Component {
             <div className="text-center">
               <Button disabled={transferDisabled} onClick={() => this.transferToken()}>发送</Button>
             </div>
+          </Panel.Body>
+        </Panel>
+        <p/>
+        <Panel>
+          <Panel.Heading>
+            <img src="img/account_info.png"/>
+            代币信息
+          </Panel.Heading>
+          <Panel.Body>
+            <FormGroup>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='DDP                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='DDU                            10000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='MZB                            10000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='CTT                            10000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='PYH                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='TPC                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='KC                            50000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='PET                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='TBC                            50000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='MYC                            10000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='SBC                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='TC                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+              <p/>
+              <InputGroup>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/account.png"/></InputGroup.Addon>
+                <FormControl readOnly type="text" size="21" value='ADC                            100000000000.0000'/>
+                <InputGroup.Button>
+                  <OverlayTrigger placement="bottom" overlay={copyTooltip}>
+                    <Button onClick={() => this.copyPublicKey()}>
+                      <Glyphicon glyph="copy" />
+                    </Button>
+                  </OverlayTrigger>
+                </InputGroup.Button>
+              </InputGroup>
+            </FormGroup>
           </Panel.Body>
         </Panel>
         <p/>
