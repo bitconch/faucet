@@ -1404,47 +1404,47 @@ export class Wallet extends React.Component {
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='CTT                            10000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='PYH                            100000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='TPC                            100000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='KC                            50000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='TBC                            50000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='MYC                            10000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='SBC                            100000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='TC                            100000000000.0000'/>
               </InputGroup>
               <p/>
               <InputGroup>
-                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/transfer_token.png"/></InputGroup.Addon>
+                <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_Icon.png"/></InputGroup.Addon>
                 <FormControl readOnly type="text" size="21" value='ADC                            100000000000.0000'/>
               </InputGroup>
             </FormGroup>
