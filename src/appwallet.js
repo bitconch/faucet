@@ -22,11 +22,12 @@ import * as web3 from '@bitconch/bitconch-web3j';
 import {Settings} from './settings';
 import data from '../publickey.json';
 import Background from './images/account_backgroud.png';
+import CopyIcon from './images/address_copy.png';
 
 const AIRDORP_QUOTA = 3000;
 
 var sectionStyle = {
-  height: '300px',
+  height: '250px',
   background: `url(${Background})`
 };
 
@@ -51,12 +52,11 @@ class PropertySection extends React.Component{
   //接收父组件传递过来的item
   render(){
     return(
-      <div>
-        <img src={require('./images/'+this.props.tokenLogo)}/>
-        <span>{this.props.tokenName}</span>
-        <span>{this.props.tokenAmount}</span>
-        <img src={require('./images/account_change.png')} style={{float: 'right'}} onClick={this.props.transferAccounts}/>
-
+      <div style={{height:'50px'}}>
+        <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginLeft:'20px',width:'30px',height:'30px'}}/>
+        <input type="lable"  value={this.props.tokenName} style={{fontSize:'15px',color:'#000',border:'none',backgroundColor:'transparent',marginLeft:'10px'}}/>
+        <img src={require('./images/account_change.png')} style={{float: 'right',marginRight:'20px',width:'25px',height:'25px'}} onClick={this.props.transferAccounts}/>
+        <input type="lable"  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#000',border:'none',backgroundColor:'transparent',float:'right',marginRight:'20px'}}/>
         <p/>
       </div>
     );
@@ -1284,26 +1284,26 @@ export class Wallet extends React.Component {
         {transferModal}
         <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
         <div style={sectionStyle}>
-          <div style={{'padding': '25px 0 20px 0',textAlign:'center'}}>
-            <img src={require('./images/bus_white.png') }/>
+          <div style={{'padding': '35px 0 15px 0',textAlign:'center'}}>
+            <img src={require('./images/bus_white.png')} style={{width:'60px',height:'60px'}}/>
           </div>
           <p />
-          <FormGroup style={{textAlign:'center'}}>
-            <InputGroup >
-              <FormControl readOnly type="text" size="50"  value={this.web3solAccount.publicKey} style={{backgroundColor: 'transparent',borderStyle:'none',color:'#fff',textAlign:'center',width:'auto'}}/>
+          <FormGroup style={{textAlign:'center',width:'100%'}}>
+            <InputGroup  style={{display: 'inline-flex'}}>
+              <FormControl readOnly type="text" size="33"  value={this.web3solAccount.publicKey} style={{fontSize:'auto',backgroundColor: 'transparent',borderStyle:'none',color:'#fff',textAlign:'center',boxShadow: 'none',float:'none'}}/>
               <InputGroup.Button>
-                <img src={require('./images/address_copy.png')} onClick={() => this.copyPublicKey()} />
+                <Button onClick={() => this.copyPublicKey()} style={{background:`url(${CopyIcon})`,backgroundSize:'30px 30px',width:'30px',height:'30px',borderStyle: 'none'}}/>
               </InputGroup.Button>
             </InputGroup>
           </FormGroup>
-          <p>
-            <Button  onClick={() => this.setState({exportSercetModal: true})} style={{float: 'left'}}>
+          <div style={{textAlign:'center'}}>
+            <Button  onClick={() => this.setState({exportSercetModal: true})} style={{'marginRight':'20px',color:'#5c83f5'}}>
             导入私钥
             </Button>
-            <Button  onClick={() => this.exportPrivateKey()}  style={{float: 'right'}}>
+            <Button  onClick={() => this.exportPrivateKey()}  style={{'marginLeft':'20px',borderColor:'#fff',color:'#fff',backgroundColor: 'transparent'}}>
             导出私钥
             </Button>
-          </p>
+          </div>
         </div>
         <p/>
         <div>
