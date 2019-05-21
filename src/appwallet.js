@@ -23,12 +23,21 @@ import {Settings} from './settings';
 import data from '../publickey.json';
 import Background from './images/account_backgroud.png';
 import CopyIcon from './images/address_copy.png';
+import TransferIcon from './images/account_change.png';
 
 const AIRDORP_QUOTA = 3000;
 
 var sectionStyle = {
   height: '250px',
+  width: '100%',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
   background: `url(${Background})`
+};
+var lineStyle = {
+  height: '0.5px',
+  backgroundColor: '#b8b6b6',
+  marginLeft:'10px'
 };
 
 // let propertyInfo=[
@@ -52,13 +61,19 @@ class PropertySection extends React.Component{
   //接收父组件传递过来的item
   render(){
     return(
-      <div style={{height:'50px'}}>
-        <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginLeft:'20px',width:'30px',height:'30px'}}/>
-        <input type="lable"  value={this.props.tokenName} style={{fontSize:'15px',color:'#000',border:'none',backgroundColor:'transparent',marginLeft:'10px'}}/>
-        <img src={require('./images/account_change.png')} style={{float: 'right',marginRight:'20px',width:'25px',height:'25px'}} onClick={this.props.transferAccounts}/>
-        <input type="lable"  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#000',border:'none',backgroundColor:'transparent',float:'right',marginRight:'20px'}}/>
-        <p/>
+      <div style={{width:'100%',height:'80.5px'}}>
+        <div style={{height:'80px',width:'100%',display: 'inline-flex'}}>
+          <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px'}}/>
+          <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
+          <div style={{float: 'right',height:'80px',display: 'inline-flex'}}>
+            <input type="text" readOnly  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'auto',height:'80px',textAlign:'right',marginRight:'10px'}}/>
+            <Button onClick={this.props.transferAccounts} style={{background:`url(${TransferIcon})`,backgroundSize:'30px 30px',width:'30px',height:'30px',borderStyle: 'none',marginRight:'10px',marginTop:'25px'}}/>
+          </div>
+        </div>
+        <div style={lineStyle}>
+        </div>
       </div>
+
     );
   }
 }
@@ -1277,12 +1292,11 @@ export class Wallet extends React.Component {
     // const createNewTokenAccountDisabled = this.state.tokenObj === null;
 
     return (
-      <div>
+      <div style={{width:'100%'}}>
         {busyModal}
         {settingsModal}
         {exportSercetModal}
         {transferModal}
-        <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
         <div style={sectionStyle}>
           <div style={{'padding': '35px 0 15px 0',textAlign:'center'}}>
             <img src={require('./images/bus_white.png')} style={{width:'60px',height:'60px'}}/>
@@ -1290,7 +1304,7 @@ export class Wallet extends React.Component {
           <p />
           <FormGroup style={{textAlign:'center',width:'100%'}}>
             <InputGroup  style={{display: 'inline-flex'}}>
-              <FormControl readOnly type="text" size="33"  value={this.web3solAccount.publicKey} style={{fontSize:'auto',backgroundColor: 'transparent',borderStyle:'none',color:'#fff',textAlign:'center',boxShadow: 'none',float:'none'}}/>
+              <FormControl readOnly type="text" size="60%"  value={this.web3solAccount.publicKey} style={{fontSize:'auto',backgroundColor: 'transparent',borderStyle:'none',color:'#fff',textAlign:'center',boxShadow: 'none',float:'none'}}/>
               <InputGroup.Button>
                 <Button onClick={() => this.copyPublicKey()} style={{background:`url(${CopyIcon})`,backgroundSize:'30px 30px',width:'30px',height:'30px',borderStyle: 'none'}}/>
               </InputGroup.Button>
@@ -1306,7 +1320,7 @@ export class Wallet extends React.Component {
           </div>
         </div>
         <p/>
-        <div>
+        <div style={{width:'100%'}}>
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
