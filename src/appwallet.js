@@ -9,7 +9,6 @@ import {
   InputGroup,
   Modal,
   // OverlayTrigger,
-  Panel,
   ProgressBar,
   // Tooltip,
   DropdownButton,
@@ -700,11 +699,9 @@ class PublicKeyInput extends React.Component {
       <form>
         <FormGroup validationState={this.state.validationState}>
           <ControlLabel>收款人地址</ControlLabel>
-          <InputGroup>
-            <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/receive_token.png"/></InputGroup.Addon>
-            <FormControl type="text" value={this.state.value} placeholder="请输入收款人的地址" onChange={(e) => this.handleChange(e)}/>
-            <FormControl.Feedback />
-          </InputGroup>
+          <input style={{backgroundColor: '#fff',border:'none'}}></input>
+          <FormControl type="text" value={this.state.value} placeholder="请输入收款人的地址" onChange={(e) => this.handleChange(e)}/>
+          <FormControl.Feedback />
         </FormGroup>
       </form>
     );
@@ -743,11 +740,9 @@ class TokenInput extends React.Component {
       <form>
         <FormGroup validationState={this.state.validationState}>
           <ControlLabel>数量</ControlLabel>
-          <InputGroup>
-            <InputGroup.Addon style={{padding: '3px',backgroundColor: '#337ab7',border:'none'}}><img src="img/token_num.png"/></InputGroup.Addon>
-            <FormControl type="text" value={this.state.value} placeholder="请输入交易数量" onChange={(e) => this.handleChange(e)}/>
-            <FormControl.Feedback />
-          </InputGroup>
+          <input style={{backgroundColor: '#fff',border:'none'}}></input>
+          <FormControl type="text" value={this.state.value} placeholder="请输入交易数量" onChange={(e) => this.handleChange(e)}/>
+          <FormControl.Feedback />
         </FormGroup>
       </form>
     );
@@ -850,32 +845,26 @@ BusyModal.propTypes = {
   text: PropTypes.string,
 };
 //
-class ExportSercetModal extends React.Component {
+class ExportSercetModal extends React.Component {//transparent
   render() {
     return (
       <Modal {...this.props} bsSize="large" aria-labelledby="contained-modal-title-lg">
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-lg">切换账户</Modal.Title>
+          <div style={{textAlign:'center'}}>
+            <input readOnly value='提示' style={{fontSize:'16px',color:'#2b2b2b',width:'60px',border:'none',backgroundColor:'transparent',textAlign:'center'}}/>
+          </div>
         </Modal.Header>
         <Modal.Body>
           <div>
-            <Panel>
-              <Panel.Heading>导入密钥</Panel.Heading>
-              <Panel.Body>
-                <FormGroup>
-                  <SercetkeyInput onSercetkey={key => this.props.exsecretkey(key)}/>
-                  <Button onClick={() => this.props.updateaccount()}>
-                    <Glyphicon glyph="import" />
-                    导入
-                  </Button>
-                </FormGroup>
-              </Panel.Body>
-            </Panel>
+            <textarea readOnly size='auto' value='导入后，当前账户相关信息将丢失，如需保存请导出私钥' style={{fontSize:'14px',textAlign:'center',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'100%'}}/>
+            <SercetkeyInput onSercetkey={key => this.props.exsecretkey(key)}/>
+            <div className="text-center">
+              <Button onClick={() => this.props.updateaccount()} style={{color:'#fff',backgroundColor:'#2cb782',width:'80px'}}>
+                确认
+              </Button>
+            </div>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={this.props.onHide}>关闭</Button>
-        </Modal.Footer>
       </Modal>
     );
   }
@@ -886,23 +875,56 @@ ExportSercetModal.propTypes = {
   onHide: PropTypes.function,
   updateaccount:PropTypes.function,
 };
+class ShowModal extends React.Component {//transparent
+  render() {
+    return (
+      <Modal {...this.props} bsSize="large" aria-labelledby="contained-modal-title-lg">
+        <Modal.Header closeButton>
+          <div style={{textAlign:'center'}}>
+            <input readOnly value='提示' style={{fontSize:'16px',color:'#2b2b2b',width:'60px',border:'none',backgroundColor:'transparent',textAlign:'center'}}/>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <textarea readOnly size='auto' value={this.props.showtext} style={{fontSize:'14px',textAlign:'center',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'100%'}}/>
+            <div className="text-center">
+              <Button onClick={() => this.props.onHide()} style={{color:'#fff',backgroundColor:'#2cb782',width:'80px'}}>
+                关闭
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+    );
+  }
+}
+
+ShowModal.propTypes = {
+  showtext: PropTypes.object,
+  onHide: PropTypes.function,
+};
 //
 class TransferModal extends React.Component {
   render() {
     return (
       <Modal {...this.props} bsSize="large" aria-labelledby="contained-modal-title-lg">
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-lg">转账</Modal.Title>
+          <div style={{textAlign:'center'}}>
+            <input readOnly value='转账' style={{fontSize:'16px',color:'#2b2b2b',width:'60px',border:'none',backgroundColor:'transparent',textAlign:'center'}}/>
+          </div>
         </Modal.Header>
         <Modal.Body>
           <div>
-            <img src={require('./images/account_head.png')} />
-            <span>BUS</span>
-            <span>收款人地址</span>
+            <div style={{'padding': '5px 0 5px 0',textAlign:'center'}}>
+              <img src={require('./images/account_head.png')} style={{width:'50px',height:'50px'}}/>
+            </div>
+            <div style={{'padding': '0 0 5px 0',textAlign:'center'}}>
+              <span>BUS</span>
+            </div>
             <PublicKeyInput onPublicKey={(publicKey) => this.props.topublickey(publicKey)}/>
             <TokenInput onAmount={(amount) => this.props.transferamount(amount)}/>
             <div className="text-center">
-              <Button onClick={() => this.props.transfer()}>发送</Button>
+              <Button onClick={() => this.props.transfer()} style={{backgroundColor:'#2cb782',color:'#fff',width:'80px'}}>发送</Button>
             </div>
           </div>
         </Modal.Body>
@@ -971,6 +993,9 @@ export class Wallet extends React.Component {
     tokenAccountPubkeyList: [],
     tokenInfoInnerHtml: null,
     tokenNameArray: [],
+    showText:null,
+    showModal: false,
+
   };
 
   constructor(props) {
@@ -1093,6 +1118,8 @@ export class Wallet extends React.Component {
 
   copyPublicKey() {
     copy(this.web3solAccount.publicKey);
+    this.setState({showText:'地址已复制到粘贴板',showModal: true});
+
   }
 
   copyTokenAccountPublicKey() {
@@ -1160,7 +1187,9 @@ export class Wallet extends React.Component {
       }
     );
   }
-
+  transferShow(){
+    this.setState({transferModal:false});
+  }
   transferToken() {
     this.runModal(
       '发送Token',
@@ -1244,6 +1273,8 @@ export class Wallet extends React.Component {
 
   exportPrivateKey() {
     copy(this.web3solAccount.secretKey);
+    this.setState({showText:'私钥复制到粘贴板，请妥善保管',showModal: true});
+
   }
 
 
@@ -1277,9 +1308,16 @@ export class Wallet extends React.Component {
       <TransferModal
         show
         onHide={() => this.setState({transferModal: false})}
-        transfer={() => this.transfer()}
+        transfer={() => this.transferShow()}
         topublickey={key => this.setRecipientPublicKey(key)}
         transferamount={key => this.setRecipientAmount(key)}
+      />
+    ) : null;
+    const showModal = this.state.showModal ? (
+      <ShowModal
+        show
+        showtext={this.state.showText}
+        onHide={() => this.setState({showModal: false})}
       />
     ) : null;
     const settingsModal = this.state.settingsModal ?
@@ -1297,6 +1335,7 @@ export class Wallet extends React.Component {
         {settingsModal}
         {exportSercetModal}
         {transferModal}
+        {showModal}
         <div style={sectionStyle}>
           <div style={{'padding': '35px 0 15px 0',textAlign:'center'}}>
             <img src={require('./images/bus_white.png')} style={{width:'60px',height:'60px'}}/>
@@ -1321,7 +1360,7 @@ export class Wallet extends React.Component {
         </div>
         <p/>
         <div style={{width:'100%'}}>
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
+          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' transferAccounts={() => this.setState({transferModal: true})} />
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
