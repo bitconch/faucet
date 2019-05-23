@@ -39,22 +39,6 @@ var lineStyle = {
   marginLeft:'10px'
 };
 
-// let propertyInfo=[
-//   {logo:'./images/account_head.png',name:'BUS',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'DDP',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'DDU',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'MZB',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'PET',amount:31100000.0000},
-//   {logo:'./images/account_head.png',name:'CTT',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'PYH',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'TPC',amount:3100000.0000},
-//   {logo:'./images/account_head.png',name:'KC',amount:1100000.0000},
-//   {logo:'./images/account_head.png',name:'TBC',amount:31.0000},
-//   {logo:'./images/account_head.png',name:'MYC',amount:0.0000},
-//   {logo:'./images/account_head.png',name:'SBC',amount:3.1000},
-//   {logo:'./images/account_head.png',name:'TC',amount:100000.0000},
-//   {logo:'./images/account_head.png',name:'ADC',amount:100000.0000}
-// ];
 //定义一个Section子组件
 class PropertySection extends React.Component{
   //接收父组件传递过来的item
@@ -62,7 +46,7 @@ class PropertySection extends React.Component{
     return(
       <div style={{width:'100%',height:'80.5px'}}>
         <div style={{height:'80px',width:'100%',display: 'inline-flex'}}>
-          <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px'}}/>
+          <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
           <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
           <div style={{float: 'right',height:'80px',display: 'inline-flex'}}>
             <input type="text" readOnly  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'auto',height:'80px',textAlign:'right',marginRight:'10px'}}/>
@@ -1361,19 +1345,18 @@ export class Wallet extends React.Component {
         <p/>
         <div style={{width:'100%'}}>
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' transferAccounts={() => this.setState({transferModal: true})} />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' />
+          <PropertySection tokenLogo='bit_up.png' tokenName='DDUP' tokenAmount='100000000000.0000' />
+          <PropertySection tokenLogo='bit_mz.png' tokenName='ASC' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_pet.png' tokenName='PET' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_ttc.png' tokenName='TTC' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_pyh.png' tokenName='PYH' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_360.png' tokenName='TPC' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_bbc.png' tokenName='BBC' tokenAmount='50000000000.0000' />
+          <PropertySection tokenLogo='bit_hour.png' tokenName='HOUR' tokenAmount='50000000000.0000' />
+          <PropertySection tokenLogo='bit_love.png' tokenName='LOVE' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_kcan.png' tokenName='SCAN' tokenAmount='100000000000.0000' />
+          <PropertySection tokenLogo='bit_vmatch.png' tokenName='VMatch' tokenAmount='100000000000.0000' />
+          <PropertySection tokenLogo='bit_vt.png' tokenName='VT' tokenAmount='100000000000.0000' />
         </div>
       </div>
     );
