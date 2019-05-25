@@ -723,7 +723,7 @@ class TokenInput extends React.Component {
     return (
       <form>
         <FormGroup validationState={this.state.validationState}>
-          <ControlLabel>数量</ControlLabel>
+          <ControlLabel>数量（{this.props.amount}）</ControlLabel>
           <input style={{backgroundColor: '#fff',border:'none'}}></input>
           <FormControl type="text" value={this.state.value} placeholder="请输入交易数量" onChange={(e) => this.handleChange(e)}/>
           <FormControl.Feedback />
@@ -733,6 +733,7 @@ class TokenInput extends React.Component {
   }
 }
 TokenInput.propTypes = {
+  amount:PropTypes.object,
   onAmount: PropTypes.function,
 };
 
@@ -906,7 +907,7 @@ class TransferModal extends React.Component {
               <span>BUS</span>
             </div>
             <PublicKeyInput onPublicKey={(publicKey) => this.props.topublickey(publicKey)}/>
-            <TokenInput onAmount={(amount) => this.props.transferamount(amount)}/>
+            <TokenInput onAmount={(amount) => this.props.transferamount(amount)} amount={this.props.amount}/>
             <div className="text-center">
               <Button onClick={() => this.props.transfer()} style={{backgroundColor:'#2cb782',color:'#fff',width:'80px'}}>发送</Button>
             </div>
@@ -918,6 +919,7 @@ class TransferModal extends React.Component {
 }
 
 TransferModal.propTypes = {
+  amount:PropTypes.object,
   topublickey: PropTypes.function,
   transferamount: PropTypes.function,
   onHide: PropTypes.function,
@@ -1293,6 +1295,7 @@ export class Wallet extends React.Component {
         transfer={() => this.sendTransaction()}
         topublickey={key => this.setRecipientPublicKey(key)}
         transferamount={key => this.setRecipientAmount(key)}
+        amount={this.state.balance}
       />
     ) : null;
     const showModal = this.state.showModal ? (
