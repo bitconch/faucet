@@ -97,7 +97,8 @@ export class Settings extends React.Component {
                   {
                     [
                       'https://api.bitconch.io',
-                      'http://47.91.255.38:8899'
+                      'http://47.91.255.38:8899',
+                      'http://47.244.209.112:8899'
                     ].map((url, index) => <MenuItem key={index} eventKey={url}>{url}</MenuItem>)
                   }
                 </DropdownButton>

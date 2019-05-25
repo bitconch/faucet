@@ -1171,9 +1171,7 @@ export class Wallet extends React.Component {
       }
     );
   }
-  transferShow(){
-    this.setState({transferModal:false});
-  }
+
   transferToken() {
     this.runModal(
       '发送Token',
@@ -1292,7 +1290,7 @@ export class Wallet extends React.Component {
       <TransferModal
         show
         onHide={() => this.setState({transferModal: false})}
-        transfer={() => this.transferShow()}
+        transfer={() => this.sendTransaction()}
         topublickey={key => this.setRecipientPublicKey(key)}
         transferamount={key => this.setRecipientAmount(key)}
       />
@@ -1344,13 +1342,13 @@ export class Wallet extends React.Component {
         </div>
         <p/>
         <div style={{width:'100%'}}>
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' transferAccounts={() => this.setState({transferModal: true})} />
+          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount={this.state.balance} transferAccounts={() => this.setState({transferModal: true})} />
           <PropertySection tokenLogo='bit_up.png' tokenName='DDUP' tokenAmount='100000000000.0000' />
           <PropertySection tokenLogo='bit_mz.png' tokenName='ASC' tokenAmount='10000000000.0000' />
           <PropertySection tokenLogo='bit_pet.png' tokenName='PET' tokenAmount='10000000000.0000' />
           <PropertySection tokenLogo='bit_ttc.png' tokenName='TTC' tokenAmount='10000000000.0000' />
           <PropertySection tokenLogo='bit_pyh.png' tokenName='PYH' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_360.png' tokenName='TPC' tokenAmount='10000000000.0000' />
+          <PropertySection tokenLogo='bit_360.png' tokenName='WJH' tokenAmount='10000000000.0000' />
           <PropertySection tokenLogo='bit_bbc.png' tokenName='BBC' tokenAmount='50000000000.0000' />
           <PropertySection tokenLogo='bit_hour.png' tokenName='HOUR' tokenAmount='50000000000.0000' />
           <PropertySection tokenLogo='bit_love.png' tokenName='LOVE' tokenAmount='10000000000.0000' />
