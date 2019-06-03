@@ -91,23 +91,6 @@ PropertySection.propTypes = {
 };
 
 class PropertySelect extends React.Component{
-  state = {
-    isSelected:false
-  }
-  //接收父组件传递过来的item
-  selectedButton(){
-    if (this.state.isSelected == false) {
-      this.setState({isSelected: true});
-      document.getElementById(this.props.buttonId).style.background=`url(${SelectOn})`;
-      document.getElementById(this.props.buttonId).style.backgroundSize='25px 25px';
-    }else{
-      this.setState({isSelected: false});
-      document.getElementById(this.props.buttonId).style.background=`url(${SelectOff})`;
-      document.getElementById(this.props.buttonId).style.backgroundSize='25px 25px';
-    }
-
-
-  }
   render(){
     return(
       <div style={{height:'80px',width:'100%'}}>
@@ -128,7 +111,8 @@ PropertySelect.propTypes = {
   tokenName: PropTypes.object,
   selected: PropTypes.function,
   switchOn: PropTypes.object,
-  buttonId: PropTypes.object
+  buttonId: PropTypes.object,
+  tokenselected: PropTypes.object
 };
 class PropertyList extends React.Component {
   componentDidMount() {
@@ -166,67 +150,67 @@ class TokenAsset extends React.Component {
     console.log('第一步:::::::',this.state.tokenNameArray);
 
   }
+  //
   async readPublicKeyFromFile() {
-    try {
-      String.format = function(src){
-        if (arguments.length == 0) return null;
-        var args = Array.prototype.slice.call(arguments, 1);
-        return src.replace(/\{(\d+)\}/g, function(m, i){
-          return args[i];
-        });
-      };
-      var i;
-      var arrToken = [];
-      for(i = 0; i < info.TokenInfos.length; i++) {
-        console.log('tokenpubkey==',info.TokenInfos[i].tokenpubkey);
-        var tokenpubkey = new web3.PublicKey(info.TokenInfos[i].tokenpubkey);
-        //根据tokenpublickey获取token信息
-        var token = new web3.Token(this.props.conn, tokenpubkey);
-        var acc = await token.tokenInfo();
-        var tokenname = acc.name;
-        var tokensymbol = acc.symbol;
-        var tokensupply = acc.supply;
-        var tokendecimal = acc.decimals;
-        var tokenlogo = info.TokenInfos[i].tokenlogo;
-        var tokenselected = false;
-        var tokenaccpubkey = '';
-        var tokenamount = '100';
-
-        // tem += '  代币名称: {' + i + '}  ';
-        //根据tokenaccoutpublickey获取余额
-        // var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
-        // var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
-
-        // tem += '余额: ' + accTokenInfo.amount;
-
-        arrToken.push({
-          token,
-          tokenpubkey,
-          tokenaccpubkey,
-          tokenname,
-          tokensymbol,
-          tokensupply,
-          tokendecimal,
-          tokenlogo,
-          tokenselected,
-          tokenamount,
-        });
-
-        // msg += String.format(
-        //   tem,
-        //   acc.name
-        // );
-      }
-      var array = localStorage.getItem('tokenArray');
-
-      console.log('tokenNameArrayarrayarray:::::::',array);
-
+    var array = localStorage.getItem('tokenArray');
+    if (array&&array.length>0) {
       this.setState({tokenNameArray: arrToken});
+    }else{
+      try {
+        String.format = function(src){
+          if (arguments.length == 0) return null;
+          var args = Array.prototype.slice.call(arguments, 1);
+          return src.replace(/\{(\d+)\}/g, function(m, i){
+            return args[i];
+          });
+        };
+        var i;
+        var arrToken = [];
+        for(i = 0; i < info.TokenInfos.length; i++) {
+          console.log('tokenpubkey==',info.TokenInfos[i].tokenpubkey);
+          var tokenpubkey = new web3.PublicKey(info.TokenInfos[i].tokenpubkey);
+          //根据tokenpublickey获取token信息
+          var token = new web3.Token(this.props.conn, tokenpubkey);
+          var acc = await token.tokenInfo();
+          var tokenname = acc.name;
+          var tokensymbol = acc.symbol;
+          var tokensupply = acc.supply;
+          var tokendecimal = acc.decimals;
+          var tokenlogo = info.TokenInfos[i].tokenlogo;
+          var tokenselected = false;
+          var tokenaccpubkey = '';
+          var tokenamount = '100';
 
+          // tem += '  代币名称: {' + i + '}  ';
+          //根据tokenaccoutpublickey获取余额
+          // var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
+          // var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
 
-    } catch (err)
-    {
-      this.addError(err.message);
+          // tem += '余额: ' + accTokenInfo.amount;
+
+          arrToken.push({
+            token,
+            tokenpubkey,
+            tokenaccpubkey,
+            tokenname,
+            tokensymbol,
+            tokensupply,
+            tokendecimal,
+            tokenlogo,
+            tokenselected,
+            tokenamount,
+          });
+
+          // msg += String.format(
+          //   tem,
+          //   acc.name
+          // );
+        }
+        this.setState({tokenNameArray: arrToken});
+      } catch (err)
+      {
+        this.addError(err.message);
+      }
     }
   }
   addSelectedToken(index){
@@ -252,7 +236,7 @@ class TokenAsset extends React.Component {
         {
           this.state.tokenNameArray.map((obj,index) => {
             return(
-              <PropertySelect key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} buttonId = {'button'+index} selected={()=>this.addSelectedToken(index)}/>
+              <PropertySelect key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} tokenselected= {obj.tokenselected} buttonId = {'button'+index} selected={()=>this.addSelectedToken(index)}/>
             );
           })
         }
