@@ -191,7 +191,6 @@ class TokenAsset extends React.Component {
         var tokenselected = false;
         var tokenaccpubkey = '';
         var tokenamount = '100';
-        console.log('token:::::::',token);
 
         // tem += '  代币名称: {' + i + '}  ';
         //根据tokenaccoutpublickey获取余额
@@ -218,7 +217,9 @@ class TokenAsset extends React.Component {
         //   acc.name
         // );
       }
-      console.log('tokenNameArray0:::::::',arrToken);
+      var array = localStorage.getItem('tokenArray');
+
+      console.log('tokenNameArrayarrayarray:::::::',array);
 
       this.setState({tokenNameArray: arrToken});
 
@@ -1072,30 +1073,6 @@ export class Wallet extends React.Component {
     super(props);
     this.onStoreChange();
   }
-  testtokens(){
-    var arrToken = [];
-    for (var i = 0; i < 5; i++) {
-      var tokenpubkey = new web3.PublicKey(data.AccountPublicKey);
-      //根据tokenpublickey获取token信息
-      var tokenname = 'BUS';
-      var tokensymbol = 'BUS';
-      var tokensupply = '1000000000000000';
-      var tokendecimal = '4';
-      var tokenlogo = 'account_head.png';
-      var tokenselected = true;
-      arrToken.push({
-        tokenpubkey,
-        tokenname,
-        tokensymbol,
-        tokensupply,
-        tokendecimal,
-        tokenlogo,
-        tokenselected
-      });
-    }
-    this.setState({tokenArr: arrToken});
-    console.log('arrrrrr==',arrToken);
-  }
 
   getTokenDetails(){
     var i;
@@ -1221,10 +1198,7 @@ export class Wallet extends React.Component {
     this.setState({tokenNameArray: tokenarr});
   }
   ResetListForPorperty(){
-    let arr = this.state.tokenNameArray;
-    console.log('tokenNameArraylast:======',arr);
     this.createNewTokenAccount();
-    this.setState({tokenArr: arr,addPropertyModal: false});
 
 
   }
@@ -1242,18 +1216,20 @@ export class Wallet extends React.Component {
     copy(this.state.newTokenAccountPublicKey);
   }
 
-  createNewTokenAccount() {
+  async createNewTokenAccount() {
     for (var i = 0; i < this.state.tokenNameArray.length; i++) {
       var tokens = this.state.tokenNameArray[i];
       if (tokens.tokenselected == true) {
         var token = tokens.token;
-        console.log('获取token余额：',token);
-        var newtokenaccpubkey = token.newAccount(this.web3solAccount);
-        tokens.tokenaccpubkey = newtokenaccpubkey.toString();
-        var accTokenInfo = token.accountInfo(newtokenaccpubkey);
-        tokens.tokenamount = accTokenInfo.amount.toString();
+        var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
+        const newTokenAccountInfo = await token.accountInfo(newtokenaccpubkey);
+        alert('token publickey: ' + newTokenAccountInfo.amount.toString());
+        tokens.tokenamount = newTokenAccountInfo.amount.toString();
       }
     }
+    let arr = this.state.tokenNameArray;
+    this.setState({tokenArr: arr,addPropertyModal: false});
+    localStorage.setItem('tokenArray',this.state.tokenNameArray);
   }
 
   refreshBalance() {
