@@ -17,17 +17,16 @@ import copy from 'copy-to-clipboard';
 import * as web3 from '@bitconch/bitconch-web3j';
 
 import {Settings} from './settings';
-import data from '../publickey.json';
-import info from '../tokens.json';
+import {PropertyDetail} from './detail';
+import info from '../publickey.json';
 import Background from './images/account_backgroud.png';
 import CopyIcon from './images/address_copy.png';
 import TransferIcon from './images/main_right.png';
 import AddIcon from './images/main_jia.png';
 import SelectOn from './images/selecte_on.png';
 import SelectOff from './images/selecte_off.png';
-
 const AIRDORP_QUOTA = 3000;
-
+const TokensArray = 'tokenArray';
 var sectionStyle = {
   height: '250px',
   width: '100%',
@@ -91,16 +90,18 @@ PropertySection.propTypes = {
 };
 
 class PropertySelect extends React.Component{
+  state = {
+    imageurl: this.props.tokenselected == false? SelectOff:SelectOn
+  }
   render(){
     return(
       <div style={{height:'80px',width:'100%'}}>
         <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
         <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
-        <Button id={this.props.buttonId} onClick={this.props.selected} style={{background:`url(${SelectOff})`,float:'right',backgroundSize:'25px 25px',width:'25px',height:'25px',borderStyle: 'none',marginRight:'10px',marginTop:'27.5px'}}/>
+        <Button id={this.props.buttonId} onClick={this.props.selected} style={{background:`url(${this.state.imageurl})`,float:'right',backgroundSize:'25px 25px',width:'25px',height:'25px',borderStyle: 'none',marginRight:'10px',marginTop:'27.5px'}}/>
         <div style={lineStyle}>
         </div>
       </div>
-
     );
   }
 }
@@ -152,9 +153,10 @@ class TokenAsset extends React.Component {
   }
   //
   async readPublicKeyFromFile() {
-    var array = localStorage.getItem('tokenArray');
-    if (array&&array.length>0) {
-      this.setState({tokenNameArray: arrToken});
+    var weekArray = await JSON.parse(localStorage.getItem(TokensArray));
+    if (weekArray&&weekArray.length>0) {
+      console.log('weekArray:',weekArray);
+      this.setState({tokenNameArray: weekArray});
     }else{
       try {
         String.format = function(src){
@@ -179,7 +181,8 @@ class TokenAsset extends React.Component {
           var tokenlogo = info.TokenInfos[i].tokenlogo;
           var tokenselected = false;
           var tokenaccpubkey = '';
-          var tokenamount = '100';
+          var tokenamount = '10';
+          var tokenpublickey = info.TokenInfos[i].tokenpubkey;
 
           // tem += '  代币名称: {' + i + '}  ';
           //根据tokenaccoutpublickey获取余额
@@ -189,8 +192,7 @@ class TokenAsset extends React.Component {
           // tem += '余额: ' + accTokenInfo.amount;
 
           arrToken.push({
-            token,
-            tokenpubkey,
+            tokenpublickey,
             tokenaccpubkey,
             tokenname,
             tokensymbol,
@@ -206,7 +208,9 @@ class TokenAsset extends React.Component {
           //   acc.name
           // );
         }
+        console.log('arrToken:',arrToken);
         this.setState({tokenNameArray: arrToken});
+
       } catch (err)
       {
         this.addError(err.message);
@@ -928,10 +932,10 @@ class TransferModal extends React.Component {
         <Modal.Body>
           <div>
             <div style={{'padding': '5px 0 5px 0',textAlign:'center'}}>
-              <img src={require('./images/account_head.png')} style={{width:'50px',height:'50px'}}/>
+              <img src={require('./images/'+this.props.logo)} style={{width:'50px',height:'50px'}}/>
             </div>
             <div style={{'padding': '0 0 5px 0',textAlign:'center'}}>
-              <span>BUS</span>
+              <span>{this.props.name}</span>
             </div>
             <PublicKeyInput onPublicKey={(publicKey) => this.props.topublickey(publicKey)}/>
             <TokenInput onAmount={(amount) => this.props.transferamount(amount)} amount={this.props.amount}/>
@@ -946,6 +950,8 @@ class TransferModal extends React.Component {
 }
 
 TransferModal.propTypes = {
+  logo: PropTypes.object,
+  name: PropTypes.object,
   amount:PropTypes.object,
   topublickey: PropTypes.function,
   transferamount: PropTypes.function,
@@ -1035,6 +1041,9 @@ export class Wallet extends React.Component {
     tokenSymbol: null,
     tokenDecimal: 0,
     tokenAmount: 0,
+    tokenLogo: null,
+    tokenAccPubkey: null,
+    tokenPublicKey: null,
     newTokenAcountAddr: null,
     sourceTokenAccountPublicKey: null,
     destTokenAccountPublicKey: null,
@@ -1050,12 +1059,44 @@ export class Wallet extends React.Component {
     showText:null,
     showModal: false,
     addPropertyModal:false,
-    tokenArr: []
+    tokenArr: [],
+    displaydetail: 'none'
   };
 
   constructor(props) {
     super(props);
     this.onStoreChange();
+    this.getArrayFromlocal();
+  }
+  async getArrayFromlocal(){
+    var weekArray =  await JSON.parse(localStorage.getItem(TokensArray));
+    this.setState({tokenNameArray: weekArray});
+    this.loadlocalarr(weekArray);
+  }
+  async loadlocalarr(array){
+    var tokensArr = [];
+    for (var i = 0; i < array.length; i++) {
+      var tokens = array[i];
+      if (tokens.tokenselected == true) {
+        var publickey = new web3.PublicKey(tokens.tokenpublickey);
+        var token = new web3.Token(this.web3sol, publickey);
+        var tokenaccpubkey = tokens.tokenaccpubkey;
+        if (tokenaccpubkey.length == 0){
+          var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
+          tokens.tokenaccpubkey = newtokenaccpubkey.toString();
+          const newTokenAccountInfo = await token.accountInfo(newtokenaccpubkey);
+          tokens.tokenamount = newTokenAccountInfo.amount.toString();
+        }else{
+          var accpublickey = new web3.PublicKey(tokenaccpubkey);
+          const newTokenAccountInfo = await token.accountInfo(accpublickey);
+          tokens.tokenamount = newTokenAccountInfo.amount.toString();
+        }
+
+      }
+      tokensArr.push(tokens);
+
+    }
+    this.setState({tokenArr: array,addPropertyModal: false});
   }
 
   getTokenDetails(){
@@ -1063,8 +1104,8 @@ export class Wallet extends React.Component {
     // var tem = '';
     // var msg = '';
     var arrTokenDetails = [];
-    for(i = 0; i < data.TokenDetail.length; i++) {
-      arrTokenDetails.push(data.TokenDetail[i]);
+    for(i = 0; i < info.TokenDetail.length; i++) {
+      arrTokenDetails.push(info.TokenDetail[i]);
     }
     alert(arrTokenDetails);
     return arrTokenDetails;
@@ -1183,8 +1224,6 @@ export class Wallet extends React.Component {
   }
   ResetListForPorperty(){
     this.createNewTokenAccount();
-
-
   }
   copyPublicKey() {
     copy(this.web3solAccount.publicKey);
@@ -1200,20 +1239,38 @@ export class Wallet extends React.Component {
     copy(this.state.newTokenAccountPublicKey);
   }
 
-  async createNewTokenAccount() {
-    for (var i = 0; i < this.state.tokenNameArray.length; i++) {
-      var tokens = this.state.tokenNameArray[i];
-      if (tokens.tokenselected == true) {
-        var token = tokens.token;
-        var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
-        const newTokenAccountInfo = await token.accountInfo(newtokenaccpubkey);
-        alert('token publickey: ' + newTokenAccountInfo.amount.toString());
-        tokens.tokenamount = newTokenAccountInfo.amount.toString();
+  createNewTokenAccount() {
+    this.runModal(
+      '正在添加',
+      '请稍后...',
+      async () => {
+        var tokensArr = [];
+        for (var i = 0; i < this.state.tokenNameArray.length; i++) {
+          var tokens = this.state.tokenNameArray[i];
+          if (tokens.tokenselected == true) {
+            var publickey = new web3.PublicKey(tokens.tokenpublickey);
+            var token = new web3.Token(this.web3sol, publickey);
+            var tokenaccpubkey = tokens.tokenaccpubkey;
+            if (tokenaccpubkey.length == 0){
+              var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
+              tokens.tokenaccpubkey = newtokenaccpubkey.toString();
+              const newTokenAccountInfo = await token.accountInfo(newtokenaccpubkey);
+              tokens.tokenamount = newTokenAccountInfo.amount.toString();
+            }else{
+              var accpublickey = new web3.PublicKey(tokenaccpubkey);
+              const newTokenAccountInfo = await token.accountInfo(accpublickey);
+              tokens.tokenamount = newTokenAccountInfo.amount.toString();
+            }
+          }
+          tokensArr.push(tokens);
+
+        }
+        let arr = this.state.tokenNameArray;
+        console.log('arrrrrr:',arr);
+        localStorage.setItem(TokensArray,JSON.stringify(tokensArr));
+        this.setState({tokenArr: arr,addPropertyModal: false});
       }
-    }
-    let arr = this.state.tokenNameArray;
-    this.setState({tokenArr: arr,addPropertyModal: false});
-    localStorage.setItem('tokenArray',this.state.tokenNameArray);
+    );
   }
 
   refreshBalance() {
@@ -1248,43 +1305,65 @@ export class Wallet extends React.Component {
       async () => {
         const transaction = web3.SystemProgram.move(
           this.web3solAccount.publicKey,
-          new web3.PublicKey(this.state.recipientPublicKey),
-          this.state.recipientAmount,
+          new web3.PublicKey(this.state.destTokenAccountPublicKey),
+          this.state.transferTokenAmount,
         );
-        const signature = await this.web3sol.sendTransaction(this.web3solAccount, transaction);
+        const signature = await this.web3sol.sendTransaction(transaction,this.web3solAccount);
 
         await this.web3sol.confirmTransaction(signature);
+        this.setState({transferModal: false,showText:'发送成功',showModal: true});
         this.setState({
           balance: await this.web3sol.getBalance(this.web3solAccount.publicKey),
+          tokenAmount: await this.web3sol.getBalance(this.web3solAccount.publicKey)
         });
       }
     );
   }
 
   transferToken() {
+    if (this.state.destTokenAccountPublicKey == null||this.state.destTokenAccountPublicKey.length == 0) {
+      alert('请输入收款地址');
+      return;
+    }
+    if (this.state.destTokenAccountPublicKey == null||this.state.destTokenAccountPublicKey == 0) {
+      alert('请输入转账金额');
+      return;
+    }
+    if (this.state.destTokenAccountPublicKey == this.state.tokenAccPubkey) {
+      alert('不能转给自己');
+      return;
+    }
+    if (this.state.tokenAccPubkey == this.web3solAccount.publicKey.toString()) {
+      alert('pubkey:::'+this.state.destTokenAccountPublicKey);
+      this.sendTransaction();
+      return;
+    }
+
     this.runModal(
       '发送Token',
       '请稍后...',
       async () => {
-        var sourcetokenacc = await this.state.tokenObj.accountInfo(new web3.PublicKey(this.state.sourceTokenAccountPublicKey));
+        var token = await new web3.Token(this.web3sol, new web3.PublicKey(this.state.tokenPublicKey));
+        var sourcetokenacc = await token.accountInfo(new web3.PublicKey(this.state.tokenAccPubkey));
         if (new Number(sourcetokenacc.amount) < new Number(this.state.transferTokenAmount)) {
           alert('token数量不足，无法完成交易! 当前账户Token数量：' + sourcetokenacc.amount);
           return;
         }
-
-        const sig = await this.state.tokenObj.transfer(
+        const sig = await token.transfer(
           this.web3solAccount,
-          new web3.PublicKey(this.state.sourceTokenAccountPublicKey),
+          new web3.PublicKey(this.state.tokenAccPubkey),
           new web3.PublicKey(this.state.destTokenAccountPublicKey),
           this.state.transferTokenAmount
         );
         await this.web3sol.confirmTransaction(sig);
-        sourcetokenacc = await this.state.tokenObj.accountInfo(new web3.PublicKey(this.state.sourceTokenAccountPublicKey));
-        var desttokenacc = await this.state.tokenObj.accountInfo(new web3.PublicKey(this.state.destTokenAccountPublicKey));
+        sourcetokenacc = await token.accountInfo(new web3.PublicKey(this.state.tokenAccPubkey));
+        var desttokenacc = await token.accountInfo(new web3.PublicKey(this.state.destTokenAccountPublicKey));
+        this.setState({transferModal: false,showText:'发送成功',showModal: true});
         this.setState({
-          sourceTokenAccountTokenAmount: sourcetokenacc.amount.toString(),
+          tokenAmount: sourcetokenacc.amount.toString(),
           destTokenAccountTokenAmount: desttokenacc.amount.toString(),
         });
+        this.getArrayFromlocal();
       }
     );
   }
@@ -1347,7 +1426,10 @@ export class Wallet extends React.Component {
     this.setState({showText:'私钥复制到粘贴板，请妥善保管',showModal: true});
 
   }
-
+  copyAccountPublickey(){
+    copy(this.state.tokenAccPubkey);
+    this.setState({showText:'收款地址已复制到粘贴板',showModal: true});
+  }
 
   confirmTransaction() {
     this.runModal(
@@ -1363,7 +1445,18 @@ export class Wallet extends React.Component {
       }
     );
   }
-
+  pushNewWindow(index){
+    if (index == 999) {
+      this.setState({tokenName: 'BUS',tokenAmount:this.state.balance,tokenAccPubkey:this.web3solAccount.publicKey.toString(),tokenLogo: 'account_head.png',tokenPublicKey:this.web3solAccount.publicKey.toString()});
+    }else{
+      var token = this.state.tokenArr[index];
+      this.setState({tokenName: token.tokenname,tokenAmount: token.tokenamount,tokenAccPubkey: token.tokenaccpubkey,tokenLogo: token.tokenlogo,tokenPublicKey: token.tokenpublickey});
+    }
+    this.setState({displaydetail: 'block'});
+  }
+  closeNewWindow(){
+    this.setState({displaydetail: 'none'});
+  }
   render() {
     const busyModal = this.state.busyModal ?
       <BusyModal show title={this.state.busyModal.title} text={this.state.busyModal.text} /> : null;
@@ -1379,10 +1472,12 @@ export class Wallet extends React.Component {
       <TransferModal
         show
         onHide={() => this.setState({transferModal: false})}
-        transfer={() => this.sendTransaction()}
-        topublickey={key => this.setRecipientPublicKey(key)}
-        transferamount={key => this.setRecipientAmount(key)}
-        amount={this.state.balance}
+        transfer={() => this.transferToken()}
+        topublickey={key => this.setDestTokenAccountPublicKey(key)}
+        transferamount={key => this.setTransferTokenAmount(key)}
+        amount={this.state.tokenAmount}
+        name = {this.state.tokenName}
+        logo = {this.state.tokenLogo}
       />
     ) : null;
     const showModal = this.state.showModal ? (
@@ -1406,13 +1501,6 @@ export class Wallet extends React.Component {
 
     const settingsModal = this.state.settingsModal ?
       <SettingsModal show store={this.props.store} onHide={() => this.setState({settingsModal: false})}/> : null;
-
-    // const sendDisabled = this.state.recipientPublicKey === null || this.state.recipientAmount === null;
-    // const createDisabled = this.state.tokenSupply === 0 || this.state.tokenDecimal === 0 || this.state.tokenName === null || this.state.tokenSymbol ===null;
-    // const airdropDisabled = this.state.balance !== 0;
-    // const transferDisabled = this.state.SourceTokenAccountPubKeyInput === null || this.state.destTokenAccountPublicKey === null || this.state.transferTokenAmount === 0 || this.state.tokenObj === null;
-    // const createNewTokenAccountDisabled = this.state.tokenObj === null;
-
     return (
       <div style={{width:'100%'}}>
         {busyModal}
@@ -1422,7 +1510,9 @@ export class Wallet extends React.Component {
         {showModal}
         {addPropertyModal}
         <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
-
+        <div style={{width:'100%',height:'100%',position:'absolute',zIndex:'999',opacity:'1',backgroundColor:'#fff',display:this.state.displaydetail}}>
+          <PropertyDetail store={this.props.store} closedetail = {() => this.closeNewWindow()} tokenname={this.state.tokenName} tokenamount={this.state.tokenAmount} tokenaccpubkey={this.state.tokenAccPubkey} rechangeamount={()=>this.setState({transferModal: true})} showcode={()=>this.copyAccountPublickey()}/>
+        </div>
         <div style={sectionStyle}>
           <div style={{'padding': '35px 0 15px 0',textAlign:'center'}}>
             <img src={require('./images/bus_white.png')} style={{width:'60px',height:'60px'}}/>
@@ -1450,12 +1540,12 @@ export class Wallet extends React.Component {
           <PropertyAdd addproperty={() => this.setState({addPropertyModal: true})}/>
         </div>
         <div style={{width:'100%'}}>
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount={this.state.balance} transferAccounts={() => this.setState({transferModal: true})} />
+          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount={this.state.balance} transferAccounts={() => this.pushNewWindow(999)} />
           {
             this.state.tokenArr.map((obj,index) => {
               if (obj.tokenselected==true) {
                 return(
-                  <PropertySection key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} tokenAmount={obj.tokenamount}/>
+                  <PropertySection key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} tokenAmount={obj.tokenamount} transferAccounts={() => this.pushNewWindow(index)}/>
                 );
               }
             })
