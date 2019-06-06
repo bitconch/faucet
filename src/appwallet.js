@@ -26,7 +26,6 @@ import AddIcon from './images/main_jia.png';
 import SelectOn from './images/selecte_on.png';
 import SelectOff from './images/selecte_off.png';
 const AIRDORP_QUOTA = 3000;
-const TokensArray = 'tokenArray';
 var sectionStyle = {
   height: '250px',
   width: '100%',
@@ -70,8 +69,8 @@ class PropertySection extends React.Component{
         <div style={{height:'80px',width:'100%',display: 'inline-flex'}}>
           <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
           <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
-          <div style={{float: 'right',height:'80px',display: 'inline-flex'}}>
-            <input type="text" readOnly  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'auto',height:'80px',textAlign:'right',marginRight:'10px'}}/>
+          <div style={{float: 'right',width:'100%',height:'80px',display: 'inline-flex'}}>
+            <input type="text" readOnly  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'inherit',height:'80px',textAlign:'right',marginRight:'10px'}}/>
             <Button onClick={this.props.transferAccounts} style={{background:`url(${TransferIcon})`,backgroundSize:'25px 25px',width:'25px',height:'25px',borderStyle: 'none',marginRight:'10px',marginTop:'27.5px'}}/>
           </div>
         </div>
@@ -153,6 +152,7 @@ class TokenAsset extends React.Component {
   }
   //
   async readPublicKeyFromFile() {
+    var TokensArray = this.props.publickey;
     var weekArray = await JSON.parse(localStorage.getItem(TokensArray));
     if (weekArray&&weekArray.length>0) {
       console.log('weekArray:',weekArray);
@@ -250,6 +250,7 @@ class TokenAsset extends React.Component {
 }
 
 TokenAsset.propTypes = {
+  publickey: PropTypes.object,
   onTokenAsset: PropTypes.function,
   conn: PropTypes.object,
 };
@@ -979,7 +980,7 @@ class AddPropertyModal extends React.Component {
         <Modal.Body>
           <div>
             <div>
-              <TokenAsset conn={this.props.web3sol} onTokenAsset={(tokenarr)=>this.PostPoroertyList(tokenarr)}/>
+              <TokenAsset conn={this.props.web3sol} publickey={this.props.publickey} onTokenAsset={(tokenarr)=>this.PostPoroertyList(tokenarr)}/>
             </div>
             <div className="text-center">
               <Button onClick={() => this.props.addsure()} style={{backgroundColor:'#2cb782',color:'#fff',width:'80px',marginTop:'10px'}}>确定</Button>
@@ -992,6 +993,7 @@ class AddPropertyModal extends React.Component {
 }
 
 AddPropertyModal.propTypes = {
+  publickey: PropTypes.object,
   web3sol: PropTypes.object,
   offSelect: PropTypes.function,
   onSelect: PropTypes.function,
@@ -1069,6 +1071,7 @@ export class Wallet extends React.Component {
     this.getArrayFromlocal();
   }
   async getArrayFromlocal(){
+    var TokensArray = this.web3solAccount.publicKey.toString();
     var weekArray =  await JSON.parse(localStorage.getItem(TokensArray));
     this.setState({tokenNameArray: weekArray});
     this.loadlocalarr(weekArray);
@@ -1249,26 +1252,24 @@ export class Wallet extends React.Component {
           var tokens = this.state.tokenNameArray[i];
           if (tokens.tokenselected == true) {
             var publickey = new web3.PublicKey(tokens.tokenpublickey);
-            var token = new web3.Token(this.web3sol, publickey);
+            var token =  new web3.Token(this.web3sol, publickey);
             var tokenaccpubkey = tokens.tokenaccpubkey;
-            if (tokenaccpubkey.length == 0){
-              var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
-              tokens.tokenaccpubkey = newtokenaccpubkey.toString();
-              const newTokenAccountInfo = await token.accountInfo(newtokenaccpubkey);
+            if (tokenaccpubkey == ''){
+              var newtokenaccpubkey = await token.newAccount(this.web3solAccount);
+              var newTokenAccountInfo = await  token.accountInfo(newtokenaccpubkey);
+              token.tokenaccpubkey = newtokenaccpubkey.toString();
               tokens.tokenamount = newTokenAccountInfo.amount.toString();
             }else{
               var accpublickey = new web3.PublicKey(tokenaccpubkey);
-              const newTokenAccountInfo = await token.accountInfo(accpublickey);
-              tokens.tokenamount = newTokenAccountInfo.amount.toString();
+              var newTokenAccountInfo1 = await token.accountInfo(accpublickey);
+              tokens.tokenamount = newTokenAccountInfo1.amount.toString();
             }
           }
           tokensArr.push(tokens);
-
         }
-        let arr = this.state.tokenNameArray;
-        console.log('arrrrrr:',arr);
+        var TokensArray = this.web3solAccount.publicKey.toString();
         localStorage.setItem(TokensArray,JSON.stringify(tokensArr));
-        this.setState({tokenArr: arr,addPropertyModal: false});
+        this.setState({tokenArr: tokensArr,addPropertyModal: false});
       }
     );
   }
@@ -1490,6 +1491,7 @@ export class Wallet extends React.Component {
     const addPropertyModal = this.state.addPropertyModal ? (
       <AddPropertyModal
         show
+        publickey = {this.web3solAccount.publicKey.toString()}
         web3sol = {this.web3sol}
         tokenarr = {(tokenarr) => this.addPorpertyList(tokenarr)}
         addsure = {() => this.ResetListForPorperty()}
