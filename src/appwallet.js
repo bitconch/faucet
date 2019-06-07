@@ -36,7 +36,8 @@ var sectionStyle = {
 var lineStyle = {
   height: '0.5px',
   backgroundColor: '#b8b6b6',
-  marginLeft:'10px'
+  marginLeft:'10px',
+  width:'100%'
 };
 
 //定义一个Section子组件
@@ -65,7 +66,7 @@ class PropertySection extends React.Component{
   //接收父组件传递过来的item
   render(){
     return(
-      <div style={{width:'100%',height:'80.5px'}}>
+      <div style={{width:'100%',height:'81px'}}>
         <div style={{height:'80px',width:'100%',display: 'inline-flex'}}>
           <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
           <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
@@ -1073,35 +1074,41 @@ export class Wallet extends React.Component {
   async getArrayFromlocal(){
     var TokensArray = this.web3solAccount.publicKey.toString();
     var weekArray =  await JSON.parse(localStorage.getItem(TokensArray));
-    this.setState({tokenNameArray: weekArray});
-    this.loadlocalarr(weekArray);
-  }
-  async loadlocalarr(array){
-    var tokensArr = [];
-    for (var i = 0; i < array.length; i++) {
-      var tokens = array[i];
-      if (tokens.tokenselected == true) {
-        var publickey = new web3.PublicKey(tokens.tokenpublickey);
-        var token = new web3.Token(this.web3sol, publickey);
-        var tokenaccpubkey = tokens.tokenaccpubkey;
-        if (tokenaccpubkey.length == 0){
-          var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
-          tokens.tokenaccpubkey = newtokenaccpubkey.toString();
-          const newTokenAccountInfo = await token.accountInfo(newtokenaccpubkey);
-          tokens.tokenamount = newTokenAccountInfo.amount.toString();
-        }else{
-          var accpublickey = new web3.PublicKey(tokenaccpubkey);
-          const newTokenAccountInfo = await token.accountInfo(accpublickey);
-          tokens.tokenamount = newTokenAccountInfo.amount.toString();
-        }
-
-      }
-      tokensArr.push(tokens);
-
+    if (weekArray&&weekArray.length>0) {
+      this.setState({tokenNameArray: weekArray});
+      this.loadlocalarr(weekArray);
     }
-    this.setState({tokenArr: array,addPropertyModal: false});
   }
+  loadlocalarr(array){
+    this.runModal(
+      '更新账户余额',
+      '请稍后...',
+      async () => {
+        var tokensArr = [];
+        for (var i = 0; i < array.length; i++) {
+          var tokens = array[i];
+          if (tokens.tokenselected == true) {
+            var publickey = new web3.PublicKey(tokens.tokenpublickey);
+            var token = new web3.Token(this.web3sol, publickey);
+            var tokenaccpubkey = tokens.tokenaccpubkey;
+            if (tokenaccpubkey.length == 0){
+              var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
+              tokens.tokenaccpubkey = newtokenaccpubkey.toString();
+              const tokenInfo = await token.accountInfo(newtokenaccpubkey);
+              tokens.tokenamount = tokenInfo.amount.toString();
+            }else{
+              var accpublickey = new web3.PublicKey(tokenaccpubkey);
+              const newTokenAccountInfo = await token.accountInfo(accpublickey);
+              tokens.tokenamount = newTokenAccountInfo.amount.toString();
+            }
 
+          }
+          tokensArr.push(tokens);
+        }
+        this.setState({tokenArr: array,addPropertyModal: false});
+      }
+    );
+  }
   getTokenDetails(){
     var i;
     // var tem = '';
@@ -1210,7 +1217,7 @@ export class Wallet extends React.Component {
     if (array.length === 64) {
       var typedArray = new Uint8Array(array);
       await this.props.store.exportAccount(typedArray);
-      this.refreshBalance();
+      window.location.reload();
       this.setState({exportSercetModal:false});
     }
   }
@@ -1256,9 +1263,10 @@ export class Wallet extends React.Component {
             var tokenaccpubkey = tokens.tokenaccpubkey;
             if (tokenaccpubkey == ''){
               var newtokenaccpubkey = await token.newAccount(this.web3solAccount);
-              var newTokenAccountInfo = await  token.accountInfo(newtokenaccpubkey);
-              token.tokenaccpubkey = newtokenaccpubkey.toString();
-              tokens.tokenamount = newTokenAccountInfo.amount.toString();
+              tokens.tokenaccpubkey = newtokenaccpubkey.toString();
+              const tokenInfo = await token.accountInfo(newtokenaccpubkey);
+              console.log('tokenInfo.amount.toString()::',tokenInfo.amount.toString());
+              tokens.tokenamount = tokenInfo.amount.toString();
             }else{
               var accpublickey = new web3.PublicKey(tokenaccpubkey);
               var newTokenAccountInfo1 = await token.accountInfo(accpublickey);
@@ -1269,6 +1277,7 @@ export class Wallet extends React.Component {
         }
         var TokensArray = this.web3solAccount.publicKey.toString();
         localStorage.setItem(TokensArray,JSON.stringify(tokensArr));
+        console.log('tokensArr == ',tokensArr);
         this.setState({tokenArr: tokensArr,addPropertyModal: false});
       }
     );
