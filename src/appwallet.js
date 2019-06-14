@@ -47,6 +47,10 @@ class PropertyAdd extends React.Component{
     return(
       <div style={{width:'100%',height:'60.5px',backgroundColor:'#f7f7f7'}}>
         <input type="text" readOnly value='资产' style={{fontSize:'18px',width:'60px',height:'60px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'15px'}}/>
+        <Button disabled={this.props.icondisabled} onClick={this.props.requestairdrop}>
+          <Glyphicon glyph="arrow-down" />
+          申请空投
+        </Button>
         <Button onClick={this.props.addproperty} style={{background:`url(${AddIcon})`,backgroundSize:'30px 30px',width:'30px',height:'30px',borderStyle: 'none',marginRight:'10px',marginTop:'15px',float:'right'}}/>
         <div style={lineStyle}>
         </div>
@@ -58,8 +62,9 @@ class PropertyAdd extends React.Component{
 
 //
 PropertyAdd.propTypes = {
-
+  icondisabled: PropTypes.object,
   addproperty:PropTypes.function,
+  requestairdrop:PropTypes.function,
 };
 //定义一个Section子组件
 class PropertySection extends React.Component{
@@ -1094,8 +1099,7 @@ export class Wallet extends React.Component {
             if (tokenaccpubkey.length == 0){
               var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
               tokens.tokenaccpubkey = newtokenaccpubkey.toString();
-              const tokenInfo = await token.accountInfo(newtokenaccpubkey);
-              tokens.tokenamount = tokenInfo.amount.toString();
+              tokens.tokenamount = '0';
             }else{
               var accpublickey = new web3.PublicKey(tokenaccpubkey);
               const newTokenAccountInfo = await token.accountInfo(accpublickey);
@@ -1264,9 +1268,7 @@ export class Wallet extends React.Component {
             if (tokenaccpubkey == ''){
               var newtokenaccpubkey = await token.newAccount(this.web3solAccount);
               tokens.tokenaccpubkey = newtokenaccpubkey.toString();
-              const tokenInfo = await token.accountInfo(newtokenaccpubkey);
-              console.log('tokenInfo.amount.toString()::',tokenInfo.amount.toString());
-              tokens.tokenamount = tokenInfo.amount.toString();
+              tokens.tokenamount = '0';
             }else{
               var accpublickey = new web3.PublicKey(tokenaccpubkey);
               var newTokenAccountInfo1 = await token.accountInfo(accpublickey);
@@ -1538,17 +1540,17 @@ export class Wallet extends React.Component {
             </InputGroup>
           </FormGroup>
           <div style={{textAlign:'center'}}>
-            <Button  onClick={() => this.setState({exportSercetModal: true})} style={{'marginRight':'20px',color:'#5c83f5'}}>
+            <Button disabled={true} onClick={() => this.setState({exportSercetModal: true})} style={{marginRight:'20px',color:'#5c83f5'}}>
             导入私钥
             </Button>
-            <Button  onClick={() => this.exportPrivateKey()}  style={{'marginLeft':'20px',borderColor:'#fff',color:'#fff',backgroundColor: 'transparent'}}>
+            <Button disabled={true} onClick={() => this.exportPrivateKey()}  style={{marginLeft:'20px',borderColor:'#fff',color:'#fff',backgroundColor: 'transparent'}}>
             导出私钥
             </Button>
           </div>
         </div>
         <p/>
         <div style={{width:'100%'}}>
-          <PropertyAdd addproperty={() => this.setState({addPropertyModal: true})}/>
+          <PropertyAdd addproperty={() => this.setState({addPropertyModal: true})} icondisabled= {this.state.balance !== 0} requestairdrop={()=>this.requestAirdrop()}/>
         </div>
         <div style={{width:'100%'}}>
           <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount={this.state.balance} transferAccounts={() => this.pushNewWindow(999)} />

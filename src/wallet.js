@@ -1095,6 +1095,9 @@ export class Wallet extends React.Component {
       }
     );
   }
+  clearLocalStorage(){
+    localStorage.clear();
+  }
 
   createNewToken() {
     this.runModal(
@@ -1330,6 +1333,9 @@ export class Wallet extends React.Component {
             <p/>
             <div className="text-center">
               <Button disabled={createDisabled} onClick={() => this.createNewToken()}>创建</Button>
+            </div>
+            <div>
+              <Button onClick={() => this.clearLocalStorage()}>清除缓存</Button>
             </div>
           </Panel.Body>
         </Panel>
