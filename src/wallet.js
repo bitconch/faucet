@@ -1053,7 +1053,7 @@ export class Wallet extends React.Component {
       '发送交易',
       '请稍后...',
       async () => {
-        const transaction = web3.SystemProgram.move(
+        const transaction = web3.SystemProgram.transfer(
           this.web3solAccount.publicKey,
           new web3.PublicKey(this.state.recipientPublicKey),
           this.state.recipientAmount,
