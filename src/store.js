@@ -19,7 +19,7 @@ export class Store {
     }
 
     if (typeof this.networkEntryPoint !== 'string') {
-      this.networkEntryPoint = 'https://api.bitconch.io';
+      this.networkEntryPoint = 'http://47.244.209.112:8899';
     }
 
     if (!this.accountSecretKey) {

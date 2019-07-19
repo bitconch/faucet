@@ -51,8 +51,8 @@ class TokenAsset extends React.Component {
       // var tem = '';
       // var msg = '';
       var arrToken = [];
-      for(i = 0; i < data.TokenPublicKeys.length; i++) {
-        var tokenpubkey = new web3.PublicKey(data.TokenPublicKeys[i].tokenpubkey);
+      for(i = 0; i < data.TokenInfos.length; i++) {
+        var tokenpubkey = new web3.PublicKey(data.TokenInfos[i].tokenpubkey);
         var token = new web3.Token(this.props.conn, tokenpubkey);
         var acc = await token.tokenInfo();
         var tokenname = acc.name;
@@ -62,7 +62,7 @@ class TokenAsset extends React.Component {
 
         // tem += '  代币名称: {' + i + '}  ';
 
-        var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
+        var tokenaccpubkey = data.TokenInfos[i].tokenaccpubkey;
         var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
 
         // tem += '余额: ' + accTokenInfo.amount;
@@ -1058,7 +1058,7 @@ export class Wallet extends React.Component {
           new web3.PublicKey(this.state.recipientPublicKey),
           this.state.recipientAmount,
         );
-        const signature = await this.web3sol.sendTransaction(this.web3solAccount, transaction);
+        const signature = await this.web3sol.sendTransaction(transaction,this.web3solAccount);
 
         await this.web3sol.confirmTransaction(signature);
         this.setState({
@@ -1094,6 +1094,9 @@ export class Wallet extends React.Component {
         });
       }
     );
+  }
+  clearLocalStorage(){
+    localStorage.clear();
   }
 
   createNewToken() {
@@ -1330,6 +1333,9 @@ export class Wallet extends React.Component {
             <p/>
             <div className="text-center">
               <Button disabled={createDisabled} onClick={() => this.createNewToken()}>创建</Button>
+            </div>
+            <div>
+              <Button onClick={() => this.clearLocalStorage()}>清除缓存</Button>
             </div>
           </Panel.Body>
         </Panel>

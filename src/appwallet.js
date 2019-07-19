@@ -11,21 +11,21 @@ import {
   // OverlayTrigger,
   ProgressBar,
   // Tooltip,
-  DropdownButton,
-  MenuItem,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
 import * as web3 from '@bitconch/bitconch-web3j';
 
 import {Settings} from './settings';
-import data from '../publickey.json';
+import {PropertyDetail} from './detail';
+import info from '../publickey.json';
 import Background from './images/account_backgroud.png';
 import CopyIcon from './images/address_copy.png';
-import TransferIcon from './images/account_change.png';
-
+import TransferIcon from './images/main_right.png';
+import AddIcon from './images/main_jia.png';
+import SelectOn from './images/selecte_on.png';
+import SelectOff from './images/selecte_off.png';
 const AIRDORP_QUOTA = 3000;
-
 var sectionStyle = {
   height: '250px',
   width: '100%',
@@ -36,23 +36,22 @@ var sectionStyle = {
 var lineStyle = {
   height: '0.5px',
   backgroundColor: '#b8b6b6',
-  marginLeft:'10px'
+  marginLeft:'10px',
+  width:'100%'
 };
 
 //定义一个Section子组件
-class PropertySection extends React.Component{
+class PropertyAdd extends React.Component{
   //接收父组件传递过来的item
   render(){
     return(
-      <div style={{width:'100%',height:'80.5px'}}>
-        <div style={{height:'80px',width:'100%',display: 'inline-flex'}}>
-          <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
-          <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
-          <div style={{float: 'right',height:'80px',display: 'inline-flex'}}>
-            <input type="text" readOnly  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'auto',height:'80px',textAlign:'right',marginRight:'10px'}}/>
-            <Button onClick={this.props.transferAccounts} style={{background:`url(${TransferIcon})`,backgroundSize:'30px 30px',width:'30px',height:'30px',borderStyle: 'none',marginRight:'10px',marginTop:'25px'}}/>
-          </div>
-        </div>
+      <div style={{width:'100%',height:'60.5px',backgroundColor:'#f7f7f7'}}>
+        <input type="text" readOnly value='资产' style={{fontSize:'18px',width:'60px',height:'60px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'15px'}}/>
+        <Button disabled={this.props.icondisabled} onClick={this.props.requestairdrop}>
+          <Glyphicon glyph="arrow-down" />
+          申请空投
+        </Button>
+        <Button onClick={this.props.addproperty} style={{background:`url(${AddIcon})`,backgroundSize:'30px 30px',width:'30px',height:'30px',borderStyle: 'none',marginRight:'10px',marginTop:'15px',float:'right'}}/>
         <div style={lineStyle}>
         </div>
       </div>
@@ -62,163 +61,202 @@ class PropertySection extends React.Component{
 }
 
 //
+PropertyAdd.propTypes = {
+  icondisabled: PropTypes.object,
+  addproperty:PropTypes.function,
+  requestairdrop:PropTypes.function,
+};
+//定义一个Section子组件
+class PropertySection extends React.Component{
+  //接收父组件传递过来的item
+  render(){
+    return(
+      <div style={{width:'100%',height:'81px'}}>
+        <div style={{height:'80px',width:'100%',display: 'inline-flex'}}>
+          <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
+          <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
+          <div style={{float: 'right',width:'100%',height:'80px',display: 'inline-flex'}}>
+            <input type="text" readOnly  value={this.props.tokenAmount} style={{fontSize:'15px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',width:'inherit',height:'80px',textAlign:'right',marginRight:'10px'}}/>
+            <Button onClick={this.props.transferAccounts} style={{background:`url(${TransferIcon})`,backgroundSize:'25px 25px',width:'25px',height:'25px',borderStyle: 'none',marginRight:'10px',marginTop:'27.5px'}}/>
+          </div>
+        </div>
+        <div style={lineStyle}>
+        </div>
+      </div>
+
+    );
+  }
+}
 PropertySection.propTypes = {
   tokenLogo: PropTypes.object,
   tokenName: PropTypes.object,
   tokenAmount: PropTypes.object,
   transferAccounts:PropTypes.function,
 };
+
+class PropertySelect extends React.Component{
+  state = {
+    imageurl: this.props.tokenselected == false? SelectOff:SelectOn
+  }
+  render(){
+    return(
+      <div style={{height:'80px',width:'100%'}}>
+        <img src={require('./images/'+this.props.tokenLogo)} style={{float: 'left',marginTop:'20px',marginLeft:'10px',width:'40px',height:'40px',borderRadius:'50%'}}/>
+        <input type="text" readOnly value={this.props.tokenName} style={{fontSize:'16px',width:'60px',height:'80px',color:'#2b2b2b',border:'none',backgroundColor:'transparent',marginLeft:'5px'}}/>
+        <Button id={this.props.buttonId} onClick={this.props.selected} style={{background:`url(${this.state.imageurl})`,float:'right',backgroundSize:'25px 25px',width:'25px',height:'25px',borderStyle: 'none',marginRight:'10px',marginTop:'27.5px'}}/>
+        <div style={lineStyle}>
+        </div>
+      </div>
+    );
+  }
+}
+
+//
+PropertySelect.propTypes = {
+  tokenLogo: PropTypes.object,
+  tokenName: PropTypes.object,
+  selected: PropTypes.function,
+  switchOn: PropTypes.object,
+  buttonId: PropTypes.object,
+  tokenselected: PropTypes.object
+};
+class PropertyList extends React.Component {
+  componentDidMount() {
+    console.log('sssssss:',this.props.tokenNameArray);
+  }
+  render() {
+    return (
+      <div>
+        {
+          this.props.tokenNameArray.map((obj,index) => {
+            console.log('obj======',obj);
+            return(
+              <PropertySection key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} tokenAmount='10000.000'/>
+            );
+          })
+        }
+      </div>
+    );
+  }
+}
+PropertyList.propTypes = {
+  tokenNameArray: PropTypes.object,
+};
 class TokenAsset extends React.Component {
   state = {
-    value: '',
-    validationState: null,
-    tokenInfo: null,
-    tokenNameArray: [],
+    tokenNameArray: []
   };
 
   constructor(props) {
     super(props);
     this.readPublicKeyFromFile();
   }
+  AddTokenNameArray(){
+    this.props.onTokenAsset(this.state.tokenNameArray);
+    console.log('第一步:::::::',this.state.tokenNameArray);
 
+  }
+  //
   async readPublicKeyFromFile() {
-    try {
-      String.format = function(src){
-        if (arguments.length == 0) return null;
-        var args = Array.prototype.slice.call(arguments, 1);
-        return src.replace(/\{(\d+)\}/g, function(m, i){
-          return args[i];
-        });
-      };
+    var TokensArray = this.props.publickey;
+    var weekArray = await JSON.parse(localStorage.getItem(TokensArray));
+    if (weekArray&&weekArray.length>0) {
+      console.log('weekArray:',weekArray);
+      this.setState({tokenNameArray: weekArray});
+    }else{
+      try {
+        String.format = function(src){
+          if (arguments.length == 0) return null;
+          var args = Array.prototype.slice.call(arguments, 1);
+          return src.replace(/\{(\d+)\}/g, function(m, i){
+            return args[i];
+          });
+        };
+        var i;
+        var arrToken = [];
+        for(i = 0; i < info.TokenInfos.length; i++) {
+          console.log('tokenpubkey==',info.TokenInfos[i].tokenpubkey);
+          var tokenpubkey = new web3.PublicKey(info.TokenInfos[i].tokenpubkey);
+          //根据tokenpublickey获取token信息
+          var token = new web3.Token(this.props.conn, tokenpubkey);
+          var acc = await token.tokenInfo();
+          var tokenname = acc.name;
+          var tokensymbol = acc.symbol;
+          var tokensupply = acc.supply;
+          var tokendecimal = acc.decimals;
+          var tokenlogo = info.TokenInfos[i].tokenlogo;
+          var tokenselected = false;
+          var tokenaccpubkey = '';
+          var tokenamount = '10';
+          var tokenpublickey = info.TokenInfos[i].tokenpubkey;
 
-      var i;
-      // var tem = '';
-      // var msg = '';
-      var arrToken = [];
-      for(i = 0; i < data.TokenPublicKeys.length; i++) {
-        var tokenpubkey = new web3.PublicKey(data.TokenPublicKeys[i].tokenpubkey);
-        var token = new web3.Token(this.props.conn, tokenpubkey);
-        var acc = await token.tokenInfo();
-        var tokenname = acc.name;
-        var tokensymbol = acc.symbol;
-        var tokensupply = acc.supply;
-        var tokendecimal = acc.decimals;
+          // tem += '  代币名称: {' + i + '}  ';
+          //根据tokenaccoutpublickey获取余额
+          // var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
+          // var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
 
-        // tem += '  代币名称: {' + i + '}  ';
+          // tem += '余额: ' + accTokenInfo.amount;
 
-        var tokenaccpubkey = data.TokenPublicKeys[i].tokenaccountpubkey;
-        var accTokenInfo = await token.accountInfo(new web3.PublicKey(tokenaccpubkey));
+          arrToken.push({
+            tokenpublickey,
+            tokenaccpubkey,
+            tokenname,
+            tokensymbol,
+            tokensupply,
+            tokendecimal,
+            tokenlogo,
+            tokenselected,
+            tokenamount,
+          });
 
-        // tem += '余额: ' + accTokenInfo.amount;
+          // msg += String.format(
+          //   tem,
+          //   acc.name
+          // );
+        }
+        console.log('arrToken:',arrToken);
+        this.setState({tokenNameArray: arrToken});
 
-        arrToken.push({
-          tokenpubkey,
-          tokenname,
-          tokensymbol,
-          tokensupply,
-          tokendecimal,
-          tokenaccpubkey,
-          accTokenInfo
-        });
-
-        // msg += String.format(
-        //   tem,
-        //   acc.name
-        // );
+      } catch (err)
+      {
+        this.addError(err.message);
       }
-      this.setState({
-        // tokenInfo: msg,
-        tokenNameArray: arrToken,
-      });
-    } catch (err)
-    {
-      this.addError(err.message);
     }
   }
+  addSelectedToken(index){
+    console.log('index:::::::',index);
 
-  async setTokenInfo(token) {
-    var tem = '';
-    var msg = '';
-    var to = new web3.Token(this.props.conn, token.tokenpubkey);
-    var tokenacc = await to.accountInfo(new web3.PublicKey(token.tokenaccpubkey));
-    String.format = function(src){
-      if (arguments.length == 0) return null;
-      var args = Array.prototype.slice.call(arguments, 1);
-      return src.replace(/\{(\d+)\}/g, function(m, i){
-        return args[i];
-      });
-    };
+    var tokeninfo = this.state.tokenNameArray[index];
+    console.log('tokeninfo:::::::',tokeninfo);
 
-    tem += '代币名称: {0}   ' +
-    '余额: {1}';
-
-    msg += String.format(
-      tem,
-      token.tokenname,
-      tokenacc.amount
-    );
-    this.setState({
-      tokenInfo: msg,
-    });
-    this.props.onTokenAsset(token);
-  }
-
-  getValidationState(value) {
-    const length = value.length;
-    if (length === 44) {
-      if (value.match(/^[A-Za-z0-9]+$/)) {
-        return 'success';
-      }
-      return 'error';
-    } else if (length > 44) {
-      return 'error';
-    } else if (length > 0) {
-      return 'warning';
+    if (tokeninfo.tokenselected == false) {
+      tokeninfo.tokenselected = true;
+      document.getElementById('button'+index).style.background=`url(${SelectOn})`;
+      document.getElementById('button'+index).style.backgroundSize='25px 25px';
+    }else{
+      tokeninfo.tokenselected = false;
+      document.getElementById('button'+index).style.background=`url(${SelectOff})`;
+      document.getElementById('button'+index).style.backgroundSize='25px 25px';
     }
-    return null;
+    this.AddTokenNameArray();
   }
-
-  handleChange(e) {
-    const {value} = e.target;
-    const validationState = this.getValidationState(value);
-    this.setState({
-      value: value,
-      validationState: validationState,
-    });
-
-    this.props.onTokenAsset(validationState === 'success' ? value : null);
-  }
-
   render() {
     return (
-      <form>
-        <FormGroup
-          validationState={this.state.validationState}
-        >
-          {/* <ControlLabel>资产</ControlLabel> */}
-          <DropdownButton
-            componentClass={InputGroup.Button}
-            title="资产"
-            onSelect={::this.setTokenInfo}
-          >
-            {
-              this.state.tokenNameArray.map((obj, index) => <MenuItem key={index} eventKey={obj}>{obj.tokenname}</MenuItem>)
-            }
-          </DropdownButton>
-          <FormControl
-            readOnly
-            type="text"
-            size="21"
-            value={this.state.tokenInfo}
-          />
-          <FormControl.Feedback />
-        </FormGroup>
-      </form>
+      <div>
+        {
+          this.state.tokenNameArray.map((obj,index) => {
+            return(
+              <PropertySelect key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} tokenselected= {obj.tokenselected} buttonId = {'button'+index} selected={()=>this.addSelectedToken(index)}/>
+            );
+          })
+        }
+      </div>
     );
   }
 }
 
 TokenAsset.propTypes = {
+  publickey: PropTypes.object,
   onTokenAsset: PropTypes.function,
   conn: PropTypes.object,
 };
@@ -723,7 +761,7 @@ class TokenInput extends React.Component {
     return (
       <form>
         <FormGroup validationState={this.state.validationState}>
-          <ControlLabel>数量</ControlLabel>
+          <ControlLabel>数量（{this.props.amount}）</ControlLabel>
           <input style={{backgroundColor: '#fff',border:'none'}}></input>
           <FormControl type="text" value={this.state.value} placeholder="请输入交易数量" onChange={(e) => this.handleChange(e)}/>
           <FormControl.Feedback />
@@ -733,6 +771,7 @@ class TokenInput extends React.Component {
   }
 }
 TokenInput.propTypes = {
+  amount:PropTypes.object,
   onAmount: PropTypes.function,
 };
 
@@ -900,13 +939,13 @@ class TransferModal extends React.Component {
         <Modal.Body>
           <div>
             <div style={{'padding': '5px 0 5px 0',textAlign:'center'}}>
-              <img src={require('./images/account_head.png')} style={{width:'50px',height:'50px'}}/>
+              <img src={require('./images/'+this.props.logo)} style={{width:'50px',height:'50px'}}/>
             </div>
             <div style={{'padding': '0 0 5px 0',textAlign:'center'}}>
-              <span>BUS</span>
+              <span>{this.props.name}</span>
             </div>
             <PublicKeyInput onPublicKey={(publicKey) => this.props.topublickey(publicKey)}/>
-            <TokenInput onAmount={(amount) => this.props.transferamount(amount)}/>
+            <TokenInput onAmount={(amount) => this.props.transferamount(amount)} amount={this.props.amount}/>
             <div className="text-center">
               <Button onClick={() => this.props.transfer()} style={{backgroundColor:'#2cb782',color:'#fff',width:'80px'}}>发送</Button>
             </div>
@@ -918,10 +957,55 @@ class TransferModal extends React.Component {
 }
 
 TransferModal.propTypes = {
+  logo: PropTypes.object,
+  name: PropTypes.object,
+  amount:PropTypes.object,
   topublickey: PropTypes.function,
   transferamount: PropTypes.function,
   onHide: PropTypes.function,
   transfer:PropTypes.function,
+};
+//
+class AddPropertyModal extends React.Component {
+  state={
+    tokenNameArray:[],
+  }
+  PostPoroertyList(tokenarr){
+    this.props.tokenarr(tokenarr);
+    console.log('第2步:::::::',tokenarr);
+
+  }
+  render() {
+    return (
+      <Modal {...this.props} bsSize="large" aria-labelledby="contained-modal-title-lg">
+        <Modal.Header closeButton>
+          <div style={{textAlign:'center'}}>
+            <input readOnly value='添加新资产' style={{fontSize:'16px',color:'#2b2b2b',width:'80px',border:'none',backgroundColor:'transparent',textAlign:'center'}}/>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <div>
+              <TokenAsset conn={this.props.web3sol} publickey={this.props.publickey} onTokenAsset={(tokenarr)=>this.PostPoroertyList(tokenarr)}/>
+            </div>
+            <div className="text-center">
+              <Button onClick={() => this.props.addsure()} style={{backgroundColor:'#2cb782',color:'#fff',width:'80px',marginTop:'10px'}}>确定</Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+    );
+  }
+}
+
+AddPropertyModal.propTypes = {
+  publickey: PropTypes.object,
+  web3sol: PropTypes.object,
+  offSelect: PropTypes.function,
+  onSelect: PropTypes.function,
+  onHide: PropTypes.function,
+  addsure: PropTypes.function,
+  tokenarr: PropTypes.function,
 };
 //
 class SettingsModal extends React.Component {
@@ -965,6 +1049,9 @@ export class Wallet extends React.Component {
     tokenSymbol: null,
     tokenDecimal: 0,
     tokenAmount: 0,
+    tokenLogo: null,
+    tokenAccPubkey: null,
+    tokenPublicKey: null,
     newTokenAcountAddr: null,
     sourceTokenAccountPublicKey: null,
     destTokenAccountPublicKey: null,
@@ -979,21 +1066,60 @@ export class Wallet extends React.Component {
     tokenNameArray: [],
     showText:null,
     showModal: false,
-
+    addPropertyModal:false,
+    tokenArr: [],
+    displaydetail: 'none'
   };
 
   constructor(props) {
     super(props);
     this.onStoreChange();
+    this.getArrayFromlocal();
   }
+  async getArrayFromlocal(){
+    var TokensArray = this.web3solAccount.publicKey.toString();
+    var weekArray =  await JSON.parse(localStorage.getItem(TokensArray));
+    if (weekArray&&weekArray.length>0) {
+      this.setState({tokenNameArray: weekArray});
+      this.loadlocalarr(weekArray);
+    }
+  }
+  loadlocalarr(array){
+    this.runModal(
+      '更新账户余额',
+      '请稍后...',
+      async () => {
+        var tokensArr = [];
+        for (var i = 0; i < array.length; i++) {
+          var tokens = array[i];
+          if (tokens.tokenselected == true) {
+            var publickey = new web3.PublicKey(tokens.tokenpublickey);
+            var token = new web3.Token(this.web3sol, publickey);
+            var tokenaccpubkey = tokens.tokenaccpubkey;
+            if (tokenaccpubkey.length == 0){
+              var newtokenaccpubkey =  await token.newAccount(this.web3solAccount);
+              tokens.tokenaccpubkey = newtokenaccpubkey.toString();
+              tokens.tokenamount = '0';
+            }else{
+              var accpublickey = new web3.PublicKey(tokenaccpubkey);
+              const newTokenAccountInfo = await token.accountInfo(accpublickey);
+              tokens.tokenamount = newTokenAccountInfo.amount.toString();
+            }
 
+          }
+          tokensArr.push(tokens);
+        }
+        this.setState({tokenArr: array,addPropertyModal: false});
+      }
+    );
+  }
   getTokenDetails(){
     var i;
     // var tem = '';
     // var msg = '';
     var arrTokenDetails = [];
-    for(i = 0; i < data.TokenDetail.length; i++) {
-      arrTokenDetails.push(data.TokenDetail[i]);
+    for(i = 0; i < info.TokenDetail.length; i++) {
+      arrTokenDetails.push(info.TokenDetail[i]);
     }
     alert(arrTokenDetails);
     return arrTokenDetails;
@@ -1095,11 +1221,24 @@ export class Wallet extends React.Component {
     if (array.length === 64) {
       var typedArray = new Uint8Array(array);
       await this.props.store.exportAccount(typedArray);
-      this.refreshBalance();
+      window.location.reload();
       this.setState({exportSercetModal:false});
     }
   }
 
+  selectOn(){
+
+  }
+  selectOff(){
+
+  }
+  addPorpertyList(tokenarr){
+    console.log('tokenarr======',tokenarr);
+    this.setState({tokenNameArray: tokenarr});
+  }
+  ResetListForPorperty(){
+    this.createNewTokenAccount();
+  }
   copyPublicKey() {
     copy(this.web3solAccount.publicKey);
     this.setState({showText:'地址已复制到粘贴板',showModal: true});
@@ -1116,13 +1255,32 @@ export class Wallet extends React.Component {
 
   createNewTokenAccount() {
     this.runModal(
-      '创建Token账户',
+      '正在添加',
       '请稍后...',
       async () => {
-        var newtokenaccpubkey = await this.state.tokenObj.newAccount(this.web3solAccount);
-        this.setState({
-          newTokenAccountPublicKey: newtokenaccpubkey.toString(),
-        });
+        var tokensArr = [];
+        for (var i = 0; i < this.state.tokenNameArray.length; i++) {
+          var tokens = this.state.tokenNameArray[i];
+          if (tokens.tokenselected == true) {
+            var publickey = new web3.PublicKey(tokens.tokenpublickey);
+            var token =  new web3.Token(this.web3sol, publickey);
+            var tokenaccpubkey = tokens.tokenaccpubkey;
+            if (tokenaccpubkey == ''){
+              var newtokenaccpubkey = await token.newAccount(this.web3solAccount);
+              tokens.tokenaccpubkey = newtokenaccpubkey.toString();
+              tokens.tokenamount = '0';
+            }else{
+              var accpublickey = new web3.PublicKey(tokenaccpubkey);
+              var newTokenAccountInfo1 = await token.accountInfo(accpublickey);
+              tokens.tokenamount = newTokenAccountInfo1.amount.toString();
+            }
+          }
+          tokensArr.push(tokens);
+        }
+        var TokensArray = this.web3solAccount.publicKey.toString();
+        localStorage.setItem(TokensArray,JSON.stringify(tokensArr));
+        console.log('tokensArr == ',tokensArr);
+        this.setState({tokenArr: tokensArr,addPropertyModal: false});
       }
     );
   }
@@ -1159,45 +1317,65 @@ export class Wallet extends React.Component {
       async () => {
         const transaction = web3.SystemProgram.move(
           this.web3solAccount.publicKey,
-          new web3.PublicKey(this.state.recipientPublicKey),
-          this.state.recipientAmount,
+          new web3.PublicKey(this.state.destTokenAccountPublicKey),
+          this.state.transferTokenAmount,
         );
-        const signature = await this.web3sol.sendTransaction(this.web3solAccount, transaction);
+        const signature = await this.web3sol.sendTransaction(transaction,this.web3solAccount);
 
         await this.web3sol.confirmTransaction(signature);
+        this.setState({transferModal: false,showText:'发送成功',showModal: true});
         this.setState({
           balance: await this.web3sol.getBalance(this.web3solAccount.publicKey),
+          tokenAmount: await this.web3sol.getBalance(this.web3solAccount.publicKey)
         });
       }
     );
   }
-  transferShow(){
-    this.setState({transferModal:false});
-  }
+
   transferToken() {
+    if (this.state.destTokenAccountPublicKey == null||this.state.destTokenAccountPublicKey.length == 0) {
+      alert('请输入收款地址');
+      return;
+    }
+    if (this.state.destTokenAccountPublicKey == null||this.state.destTokenAccountPublicKey == 0) {
+      alert('请输入转账金额');
+      return;
+    }
+    if (this.state.destTokenAccountPublicKey == this.state.tokenAccPubkey) {
+      alert('不能转给自己');
+      return;
+    }
+    if (this.state.tokenAccPubkey == this.web3solAccount.publicKey.toString()) {
+      alert('pubkey:::'+this.state.destTokenAccountPublicKey);
+      this.sendTransaction();
+      return;
+    }
+
     this.runModal(
       '发送Token',
       '请稍后...',
       async () => {
-        var sourcetokenacc = await this.state.tokenObj.accountInfo(new web3.PublicKey(this.state.sourceTokenAccountPublicKey));
+        var token = await new web3.Token(this.web3sol, new web3.PublicKey(this.state.tokenPublicKey));
+        var sourcetokenacc = await token.accountInfo(new web3.PublicKey(this.state.tokenAccPubkey));
         if (new Number(sourcetokenacc.amount) < new Number(this.state.transferTokenAmount)) {
           alert('token数量不足，无法完成交易! 当前账户Token数量：' + sourcetokenacc.amount);
           return;
         }
-
-        const sig = await this.state.tokenObj.transfer(
+        const sig = await token.transfer(
           this.web3solAccount,
-          new web3.PublicKey(this.state.sourceTokenAccountPublicKey),
+          new web3.PublicKey(this.state.tokenAccPubkey),
           new web3.PublicKey(this.state.destTokenAccountPublicKey),
           this.state.transferTokenAmount
         );
         await this.web3sol.confirmTransaction(sig);
-        sourcetokenacc = await this.state.tokenObj.accountInfo(new web3.PublicKey(this.state.sourceTokenAccountPublicKey));
-        var desttokenacc = await this.state.tokenObj.accountInfo(new web3.PublicKey(this.state.destTokenAccountPublicKey));
+        sourcetokenacc = await token.accountInfo(new web3.PublicKey(this.state.tokenAccPubkey));
+        var desttokenacc = await token.accountInfo(new web3.PublicKey(this.state.destTokenAccountPublicKey));
+        this.setState({transferModal: false,showText:'发送成功',showModal: true});
         this.setState({
-          sourceTokenAccountTokenAmount: sourcetokenacc.amount.toString(),
+          tokenAmount: sourcetokenacc.amount.toString(),
           destTokenAccountTokenAmount: desttokenacc.amount.toString(),
         });
+        this.getArrayFromlocal();
       }
     );
   }
@@ -1260,7 +1438,10 @@ export class Wallet extends React.Component {
     this.setState({showText:'私钥复制到粘贴板，请妥善保管',showModal: true});
 
   }
-
+  copyAccountPublickey(){
+    copy(this.state.tokenAccPubkey);
+    this.setState({showText:'收款地址已复制到粘贴板',showModal: true});
+  }
 
   confirmTransaction() {
     this.runModal(
@@ -1276,7 +1457,18 @@ export class Wallet extends React.Component {
       }
     );
   }
-
+  pushNewWindow(index){
+    if (index == 999) {
+      this.setState({tokenName: 'BUS',tokenAmount:this.state.balance,tokenAccPubkey:this.web3solAccount.publicKey.toString(),tokenLogo: 'account_head.png',tokenPublicKey:this.web3solAccount.publicKey.toString()});
+    }else{
+      var token = this.state.tokenArr[index];
+      this.setState({tokenName: token.tokenname,tokenAmount: token.tokenamount,tokenAccPubkey: token.tokenaccpubkey,tokenLogo: token.tokenlogo,tokenPublicKey: token.tokenpublickey});
+    }
+    this.setState({displaydetail: 'block'});
+  }
+  closeNewWindow(){
+    this.setState({displaydetail: 'none'});
+  }
   render() {
     const busyModal = this.state.busyModal ?
       <BusyModal show title={this.state.busyModal.title} text={this.state.busyModal.text} /> : null;
@@ -1292,9 +1484,12 @@ export class Wallet extends React.Component {
       <TransferModal
         show
         onHide={() => this.setState({transferModal: false})}
-        transfer={() => this.transferShow()}
-        topublickey={key => this.setRecipientPublicKey(key)}
-        transferamount={key => this.setRecipientAmount(key)}
+        transfer={() => this.transferToken()}
+        topublickey={key => this.setDestTokenAccountPublicKey(key)}
+        transferamount={key => this.setTransferTokenAmount(key)}
+        amount={this.state.tokenAmount}
+        name = {this.state.tokenName}
+        logo = {this.state.tokenLogo}
       />
     ) : null;
     const showModal = this.state.showModal ? (
@@ -1304,15 +1499,21 @@ export class Wallet extends React.Component {
         onHide={() => this.setState({showModal: false})}
       />
     ) : null;
+    const addPropertyModal = this.state.addPropertyModal ? (
+      <AddPropertyModal
+        show
+        publickey = {this.web3solAccount.publicKey.toString()}
+        web3sol = {this.web3sol}
+        tokenarr = {(tokenarr) => this.addPorpertyList(tokenarr)}
+        addsure = {() => this.ResetListForPorperty()}
+        onSelect = {() => this.selectOn()}
+        offSelect = {() => this.selectOff()}
+        onHide={() => this.setState({addPropertyModal: false})}
+      />
+    ) : null;
+
     const settingsModal = this.state.settingsModal ?
       <SettingsModal show store={this.props.store} onHide={() => this.setState({settingsModal: false})}/> : null;
-
-    // const sendDisabled = this.state.recipientPublicKey === null || this.state.recipientAmount === null;
-    // const createDisabled = this.state.tokenSupply === 0 || this.state.tokenDecimal === 0 || this.state.tokenName === null || this.state.tokenSymbol ===null;
-    // const airdropDisabled = this.state.balance !== 0;
-    // const transferDisabled = this.state.SourceTokenAccountPubKeyInput === null || this.state.destTokenAccountPublicKey === null || this.state.transferTokenAmount === 0 || this.state.tokenObj === null;
-    // const createNewTokenAccountDisabled = this.state.tokenObj === null;
-
     return (
       <div style={{width:'100%'}}>
         {busyModal}
@@ -1320,6 +1521,11 @@ export class Wallet extends React.Component {
         {exportSercetModal}
         {transferModal}
         {showModal}
+        {addPropertyModal}
+        <DismissibleErrors errors={this.state.errors} onDismiss={(index) => this.dismissError(index)}/>
+        <div style={{width:'100%',height:'100%',position:'absolute',zIndex:'999',opacity:'1',backgroundColor:'#fff',display:this.state.displaydetail}}>
+          <PropertyDetail store={this.props.store} closedetail = {() => this.closeNewWindow()} tokenname={this.state.tokenName} tokenamount={this.state.tokenAmount} tokenaccpubkey={this.state.tokenAccPubkey} rechangeamount={()=>this.setState({transferModal: true})} showcode={()=>this.copyAccountPublickey()}/>
+        </div>
         <div style={sectionStyle}>
           <div style={{'padding': '35px 0 15px 0',textAlign:'center'}}>
             <img src={require('./images/bus_white.png')} style={{width:'60px',height:'60px'}}/>
@@ -1334,29 +1540,29 @@ export class Wallet extends React.Component {
             </InputGroup>
           </FormGroup>
           <div style={{textAlign:'center'}}>
-            <Button  onClick={() => this.setState({exportSercetModal: true})} style={{'marginRight':'20px',color:'#5c83f5'}}>
+            <Button disabled={true} onClick={() => this.setState({exportSercetModal: true})} style={{marginRight:'20px',color:'#5c83f5'}}>
             导入私钥
             </Button>
-            <Button  onClick={() => this.exportPrivateKey()}  style={{'marginLeft':'20px',borderColor:'#fff',color:'#fff',backgroundColor: 'transparent'}}>
+            <Button disabled={true} onClick={() => this.exportPrivateKey()}  style={{marginLeft:'20px',borderColor:'#fff',color:'#fff',backgroundColor: 'transparent'}}>
             导出私钥
             </Button>
           </div>
         </div>
         <p/>
         <div style={{width:'100%'}}>
-          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount='1000.0000' transferAccounts={() => this.setState({transferModal: true})} />
-          <PropertySection tokenLogo='bit_up.png' tokenName='DDUP' tokenAmount='100000000000.0000' />
-          <PropertySection tokenLogo='bit_mz.png' tokenName='ASC' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_pet.png' tokenName='PET' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_ttc.png' tokenName='TTC' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_pyh.png' tokenName='PYH' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_360.png' tokenName='TPC' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_bbc.png' tokenName='BBC' tokenAmount='50000000000.0000' />
-          <PropertySection tokenLogo='bit_hour.png' tokenName='HOUR' tokenAmount='50000000000.0000' />
-          <PropertySection tokenLogo='bit_love.png' tokenName='LOVE' tokenAmount='10000000000.0000' />
-          <PropertySection tokenLogo='bit_kcan.png' tokenName='SCAN' tokenAmount='100000000000.0000' />
-          <PropertySection tokenLogo='bit_vmatch.png' tokenName='VMatch' tokenAmount='100000000000.0000' />
-          <PropertySection tokenLogo='bit_vt.png' tokenName='VT' tokenAmount='100000000000.0000' />
+          <PropertyAdd addproperty={() => this.setState({addPropertyModal: true})} icondisabled= {this.state.balance !== 0} requestairdrop={()=>this.requestAirdrop()}/>
+        </div>
+        <div style={{width:'100%'}}>
+          <PropertySection tokenLogo='account_head.png' tokenName='BUS' tokenAmount={this.state.balance} transferAccounts={() => this.pushNewWindow(999)} />
+          {
+            this.state.tokenArr.map((obj,index) => {
+              if (obj.tokenselected==true) {
+                return(
+                  <PropertySection key={index} tokenLogo={obj.tokenlogo} tokenName={obj.tokenname} tokenAmount={obj.tokenamount} transferAccounts={() => this.pushNewWindow(index)}/>
+                );
+              }
+            })
+          }
         </div>
       </div>
     );
